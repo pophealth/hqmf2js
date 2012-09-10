@@ -14,6 +14,9 @@ hQuery.CodedEntry::asIVL_TS = ->
   tsHigh.date = this.endDate() || this.date() || null
   new IVL_TS(tsLow, tsHigh)
 
+hQuery.CodedEntry::respondTo = (functionName) ->
+  typeof(@[functionName]) == "function"
+
 hQuery.CodedEntryList::isTrue = ->
   @length != 0
 

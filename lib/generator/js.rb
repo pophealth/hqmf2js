@@ -42,6 +42,10 @@ module HQMF2JS
         HQMF2JS::Generator.render_template('derived_data', {'criteria' => criteria})
       end
       
+      def field_method(field_name)
+        HQMF::DataCriteria::FIELDS[field_name][:coded_entry_method].to_s.camelize(:lower)
+      end
+      
       def js_for_value(value)
         if value
           if value.respond_to?(:derived?) && value.derived?

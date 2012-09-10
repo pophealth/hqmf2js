@@ -137,7 +137,7 @@ class TS
 # defaultToValue is specified it will return the supplied value if neither an accessor
 # or hash entry exists, if false it will return null.
 fieldOrContainerValue = (value, fieldName, defaultToValue=true) ->
-  if value != null
+  if value?
     if typeof value[fieldName] == 'function'
       value[fieldName]()
     else if typeof value[fieldName] != 'undefined'
@@ -286,6 +286,11 @@ filterEventsByValue = (events, value) ->
   matchingEvents = (event for event in events when (anyMatchingValue(event, value)))
   matchingEvents
 @filterEventsByValue = filterEventsByValue
+
+filterEventsByField = (events, field, value) ->
+  respondingEvents = (event for event in events when event.respondTo(field))
+  event for event in respondingEvents when value.match(event[field]())
+@filterEventsByField = filterEventsByField
 
 getCodes = (oid) ->
   OidDictionary[oid]

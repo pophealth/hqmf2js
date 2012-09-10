@@ -1,11 +1,11 @@
 require_relative '../test_helper'
 
-class HqmfJavascriptTest < Test::Unit::TestCase
+class HqmfFromJsonJavascriptTest < Test::Unit::TestCase
   def setup
-    # Open a path to all of our fixtures
-    hqmf_contents = File.open("test/fixtures/NQF59New.xml").read
-    
-    doc = HQMF::Parser.parse(hqmf_contents, HQMF::Parser::HQMF_VERSION_2)
+    json_measure = File.open("test/fixtures/json/59New.json").read
+    measure_hash = JSON.parse(json_measure)
+
+    doc = HQMF::Document.from_json(measure_hash)
     
     codes_file_path = File.expand_path("../../fixtures/codes/codes.xml", __FILE__)
     # This patient is identified from Cypress as in the denominator and numerator for NQF59
@@ -29,36 +29,7 @@ class HqmfJavascriptTest < Test::Unit::TestCase
 
     initialize_javascript_context(hqmf_utils, codes_json, converted_hqmf)
   end
-  
-  def test_codes
-    # Make sure we're recalling entries correctly
-    assert_equal 1, @context.eval('OidDictionary["2.16.840.1.113883.3.464.1.14"]').count
-    assert_equal "00110", @context.eval('OidDictionary["2.16.840.1.113883.3.464.1.14"]["HL7"][0]')
-    
-    # OIDs that are matched to multiple code systems should also work correctly
-    # The list of supported OIDs will eventually be long, so this won't be an exhaustive test, just want to be sure the functionality is right
-    assert_equal 3, @context.eval('OidDictionary["2.16.840.1.113883.3.464.1.72"]').count
-    assert_equal 2, @context.eval('OidDictionary["2.16.840.1.113883.3.464.1.72"]["CPT"]').count
-    assert_equal 3, @context.eval('OidDictionary["2.16.840.1.113883.3.464.1.72"]["LOINC"]').count
-    assert_equal 9, @context.eval('OidDictionary["2.16.840.1.113883.3.464.1.72"]["SNOMED-CT"]').count
-  end
-  
-  def test_to_js_method
-    value = @converter.to_js(@codes_hash)
-    local_context = V8::Context.new
-    patient_api = File.open('test/fixtures/patient_api.js').read
-    hqmf_utils = HQMF2JS::Generator::JS.library_functions
-    local_context.eval("#{patient_api}
-                        #{hqmf_utils}
-                        #{value}")
-                        
-    local_context.eval('typeof hqmfjs != undefined').must_equal true
-    local_context.eval('typeof OidDictionary != undefined').must_equal true
-    local_context.eval('typeof hqmfjs.IPP != undefined').must_equal true
-    local_context.eval('typeof hqmfjs.NUMER != undefined').must_equal true
-    local_context.eval('typeof hqmfjs.DENOM != undefined').must_equal true
-  end
-  
+
   def test_converted_hqmf
     # Unspecified time bounds should be nil
     assert_equal nil, @context.eval("numeratorPatient.encounters()[0].asIVL_TS().low.asDate()")
@@ -112,6 +83,8 @@ class HqmfJavascriptTest < Test::Unit::TestCase
     
     # Medications
     assert_equal 1, @context.eval("hqmfjs.DiabetesMedAdministered(numeratorPatient).length")
+    assert_equal 1, @context.eval("hqmfjs.DiabetesMedAdministeredFor7Days(numeratorPatient).length")
+    assert_equal 0, @context.eval("hqmfjs.DiabetesMedAdministeredFor9Days(numeratorPatient).length")
     assert_equal 0, @context.eval("hqmfjs.DiabetesMedIntended(numeratorPatient).length")
     assert_equal 0, @context.eval("hqmfjs.DiabetesMedSupplied(numeratorPatient).length")
     assert_equal 0, @context.eval("hqmfjs.DiabetesMedOrdered(numeratorPatient).length")
@@ -132,44 +105,4 @@ class HqmfJavascriptTest < Test::Unit::TestCase
     # XPRODUCTing
     assert_equal 1, @context.eval("hqmfjs.allDiabetes(numeratorPatient).length")
   end
-  
-  def test_converted_utils
-    # Filter events by value - HbA1C as an example
-    events = 'numeratorPatient.results().match(getCodes("2.16.840.1.113883.3.464.1.72"))'
-    assert_equal 2, @context.eval("filterEventsByValue(#{events}, new IVL_PQ(new PQ(9, '%'), null))").count
-    assert_equal 0, @context.eval("filterEventsByValue(#{events}, new IVL_PQ(new PQ(10, '%'), null))").count
-    
-    # getCode
-    assert_equal 1, @context.eval('getCodes("2.16.840.1.113883.3.464.1.14")').count
-    assert_equal "00110", @context.eval('getCodes("2.16.840.1.113883.3.464.1.14")["HL7"][0]')
-  end
-  
-  def test_map_reduce_generation
-    hqmf_contents = File.open("test/fixtures/NQF59New.xml").read
-    doc = HQMF::Parser.parse(hqmf_contents, HQMF::Parser::HQMF_VERSION_2)
-    
-    map_reduce = HQMF2JS::Converter.generate_map_reduce(doc)
-    
-    # Extremely loose testing here. Just want to be sure for now that we're getting results of some kind.
-    # We'll test for validity over on the hQuery Gateway side of things.
-    assert map_reduce[:map].include? 'map'
-    assert map_reduce[:reduce].include? 'reduce'
-    # Check functions to include actual HQMF converted function, HQMF utility function, and OID dictionary
-    assert map_reduce[:functions].include? 'IPP'
-    assert map_reduce[:functions].include? 'atLeastOneTrue'
-    assert map_reduce[:functions].include? 'OidDictionary'
-  end
-  
-  
-  def test_missing_id
-    
-    context = HQMF2JS::Generator::ErbContext.new({})
-    criteria = HQMF::DataCriteria.new(nil,nil,nil,nil,nil,nil,nil,'patient_characteristic',nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil)
-    
-    exception = assert_raise RuntimeError do
-      n = context.js_name(criteria)
-    end
-    assert exception.message.match(/^No identifier for .*/)
-  end  
-
 end

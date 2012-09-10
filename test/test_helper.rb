@@ -30,3 +30,29 @@ def get_js_context(javascript)
   @context.eval(javascript)
   @context
 end
+
+def initialize_javascript_context(hqmf_utils, codes_json, converted_hqmf)
+  patient_api = File.open('test/fixtures/patient_api.js').read
+  fixture_json = File.read('test/fixtures/patients/larry_vanderman.json')
+  initialize_patient = 'var numeratorPatient = new hQuery.Patient(larry);'
+
+  if RUBY_PLATFORM=='java'
+    @context = Rhino::Context.new
+  else
+    @context = V8::Context.new
+  end
+  @context.eval("#{patient_api}
+    #{hqmf_utils}
+    var OidDictionary = #{codes_json};
+    #{converted_hqmf}
+    var larry = #{fixture_json};
+    #{initialize_patient}")
+  @context.eval("Specifics.initialize()")
+end
+
+def compile_coffee_script
+  ctx = Sprockets::Environment.new(File.expand_path("../../..", __FILE__))
+  Tilt::CoffeeScriptTemplate.default_bare = true 
+  ctx.append_path "app/assets/javascripts"
+  HQMF2JS::Generator::JS.library_functions
+end

@@ -149,7 +149,11 @@
         ]
       }, 
       "description": "Insulin", 
-      "time": 1278475200
+      "time": 1278475200,
+      "cumulativeMedicationDuration" : {
+        "scalar": 6,
+        "unit": "d"
+      }
     }, 
     {
       "codes": {

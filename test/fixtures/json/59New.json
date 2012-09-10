@@ -1,493 +1,1352 @@
 {
+    "id": "foo",
+    "hqmf_id": "foo",
+    "hqmf_version_number": 1,
     "title": "Sample Quality Measure Document",
     "description": "This is the measure description.",
     "population_criteria": {
         "IPP": {
             "conjunction?": true,
-            "preconditions": [{
-                "reference": "ageBetween17and64",
-                "conjunction_code": "observationReference"
-            }]
+            "type": "IPP",
+            "title": "Initial Patient Population",
+            "hqmf_id": "IPP",
+            "stratification": false,
+            "preconditions": [
+                {
+                    "id": null,
+                    "reference": "ageBetween17and64"
+                }
+            ]
         },
         "DENOM": {
             "conjunction?": true,
-            "preconditions": [{
-                "preconditions": [{
-                    "preconditions": [{
-                        "reference": "HasDiabetes",
-                        "conjunction_code": "observationReference"
-                    },
-                    {
-                        "preconditions": [{
-                            "reference": "EDorInpatientEncounter",
-                            "conjunction_code": "encounterReference"
+            "type": "DENOM",
+            "title": "Denominator",
+            "hqmf_id": "DENOM",
+            "stratification": false,
+            "preconditions": [
+                {
+                    "id": null,
+                    "reference": null,
+                    "preconditions": [
+                        {
+                            "id": null,
+                            "reference": null,
+                            "preconditions": [
+                                {
+                                    "id": null,
+                                    "reference": "HasDiabetes"
+                                },
+                                {
+                                    "id": null,
+                                    "reference": null,
+                                    "preconditions": [
+                                        {
+                                            "id": null,
+                                            "reference": "EDorInpatientEncounter"
+                                        },
+                                        {
+                                            "id": null,
+                                            "reference": "AmbulatoryEncounter"
+                                        }
+                                    ],
+                                    "conjunction_code": "atLeastOneTrue"
+                                }
+                            ],
+                            "conjunction_code": "allTrue"
                         },
                         {
-                            "reference": "AmbulatoryEncounter",
-                            "conjunction_code": "encounterReference"
-                        }],
-                        "conjunction_code": "atLeastOneTrue"
-                    }],
-                    "conjunction_code": "allTrue"
-                },
-                {
-                    "reference": "DiabetesMedAdministered",
-                    "conjunction_code": "substanceAdministrationReference"
-                },
-                {
-                    "reference": "DiabetesMedIntended",
-                    "conjunction_code": "substanceAdministrationReference"
-                },
-                {
-                    "reference": "DiabetesMedSupplied",
-                    "conjunction_code": "supplyReference"
-                },
-                {
-                    "reference": "DiabetesMedOrdered",
-                    "conjunction_code": "supplyReference"
-                }],
-                "conjunction_code": "atLeastOneTrue"
-            }]
+                            "id": null,
+                            "reference": "DiabetesMedAdministered"
+                        },
+                        {
+                            "id": null,
+                            "reference": "DiabetesMedIntended"
+                        },
+                        {
+                            "id": null,
+                            "reference": "DiabetesMedSupplied"
+                        },
+                        {
+                            "id": null,
+                            "reference": "DiabetesMedOrdered"
+                        }
+                    ],
+                    "conjunction_code": "atLeastOneTrue"
+                }
+            ]
         },
         "NUMER": {
             "conjunction?": true,
-            "preconditions": [{
-                "reference": "HbA1C",
-                "conjunction_code": "observationReference"
-            }]
+            "type": "NUMER",
+            "title": "Numerator",
+            "hqmf_id": "NUMER",
+            "stratification": false,
+            "preconditions": [
+                {
+                    "id": null,
+                    "reference": "HbA1C"
+                }
+            ]
         },
         "DENEXCEP": {
             "conjunction?": true,
-            "preconditions": [{
-                "preconditions": [{
-                    "reference": "HasPolycysticOvaries",
-                    "conjunction_code": "observationReference"
+            "type": "DENEXCEP",
+            "title": "Denominator exception",
+            "hqmf_id": "DENEXCEP",
+            "stratification": false,
+            "preconditions": [
+                {
+                    "id": null,
+                    "reference": null,
+                    "preconditions": [
+                        {
+                            "id": null,
+                            "reference": "HasPolycysticOvaries"
+                        },
+                        {
+                            "id": null,
+                            "reference": "HasDiabetes"
+                        }
+                    ],
+                    "conjunction_code": "allTrue"
                 },
                 {
-                    "reference": "HasDiabetes",
-                    "conjunction_code": "observationReference"
-                }],
-                "conjunction_code": "allTrue"
-            },
-            {
-                "reference": "HasSteroidInducedDiabetes",
-                "conjunction_code": "observationReference"
-            },
-            {
-                "reference": "HasGestationalDiabetes",
-                "conjunction_code": "observationReference"
-            }]
-        },
-        "CLASSIFIER1": {
-            "conjunction?": true,
-            "preconditions": [{
-                "reference": "ageBetween17and21",
-                "conjunction_code": "substanceAdministrationReference"
-            },
-            {
-                "reference": "ageBetween22and29",
-                "conjunction_code": "substanceAdministrationReference"
-            },
-            {
-                "reference": "ageBetween30and39",
-                "conjunction_code": "substanceAdministrationReference"
-            },
-            {
-                "reference": "ageBetween40and49",
-                "conjunction_code": "substanceAdministrationReference"
-            },
-            {
-                "reference": "ageBetween50and59",
-                "conjunction_code": "substanceAdministrationReference"
-            },
-            {
-                "reference": "ageBetween60and64",
-                "conjunction_code": "substanceAdministrationReference"
-            }]
-        },
-        "CLASSIFIER2": {
-            "conjunction?": true,
-            "preconditions": [{
-                "reference": "genderMale",
-                "conjunction_code": "substanceAdministrationReference"
-            },
-            {
-                "reference": "genderFemale",
-                "conjunction_code": "substanceAdministrationReference"
-            }]
+                    "id": null,
+                    "reference": "HasSteroidInducedDiabetes"
+                },
+                {
+                    "id": null,
+                    "reference": "HasGestationalDiabetes"
+                }
+            ]
         }
     },
     "data_criteria": {
-        "StartDate": {
-            "title": "StartDate",
-            "type": "variable",
-            "value": {
-                "type": "TS",
-                "value": "20100101"
-            }
+        "birthdateThirtyYearsBeforeMeasurementPeriod": {
+            "title": "Birthdate",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
+            "property": "birthtime",
+            "type": "characteristic",
+            "definition": "patient_characteristic_birthdate",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "birthdateThirtyYearsBeforeMeasurementPeriod",
+            "inline_code_list": {
+                "LOINC": [
+                    "21112-8"
+                ]
+            },
+            "temporal_references": [
+                {
+                    "type": "SBS",
+                    "reference": "MeasurePeriod",
+                    "range": {
+                        "type": "IVL_PQ",
+                        "low": {
+                            "type": "PQ",
+                            "unit": "a",
+                            "value": "30",
+                            "inclusive?": true,
+                            "derived?": false
+                        }
+                    }
+                }
+            ]
         },
-        "EndDate": {
-            "title": "EndDate",
-            "type": "variable",
-            "value": {
-                "type": "TS",
-                "value": "20101231"
-            }
+        "birthdateFiftyYearsBeforeMeasurementPeriod": {
+            "title": "Birthdate",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
+            "property": "birthtime",
+            "type": "characteristic",
+            "definition": "patient_characteristic_birthdate",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "birthdateFiftyYearsBeforeMeasurementPeriod",
+            "inline_code_list": {
+                "LOINC": [
+                    "21112-8"
+                ]
+            },
+            "temporal_references": [
+                {
+                    "type": "SBS",
+                    "reference": "MeasurePeriod",
+                    "range": {
+                        "type": "IVL_PQ",
+                        "low": {
+                            "type": "PQ",
+                            "unit": "a",
+                            "value": "50",
+                            "inclusive?": true,
+                            "derived?": false
+                        }
+                    }
+                }
+            ]
         },
-        "ageBetween17and64": {
-            "title": "ageBetween17and64",
+        "ageFiftyBeforeMeasurementPeriod": {
+            "title": "Age",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
             "property": "age",
             "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "ageFiftyBeforeMeasurementPeriod",
             "value": {
                 "type": "IVL_PQ",
                 "low": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "17"
+                    "value": "50",
+                    "inclusive?": true,
+                    "derived?": false
+                }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
+            },
+            "temporal_references": [
+                {
+                    "type": "SBS",
+                    "reference": "MeasurePeriod"
+                }
+            ]
+        },
+        "ageBetween17and64": {
+            "title": "ageBetween17and64",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
+            "property": "age",
+            "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "ageBetween17and64",
+            "value": {
+                "type": "IVL_PQ",
+                "low": {
+                    "type": "PQ",
+                    "unit": "a",
+                    "value": "17",
+                    "inclusive?": true,
+                    "derived?": false
                 },
                 "high": {
                     "type": "PQ",
                     "unit": "a",
                     "value": "64",
-                    "inclusive?": true
+                    "inclusive?": true,
+                    "derived?": false
                 }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
             }
         },
         "ageBetween17and21": {
             "title": "ageBetween17and21",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
             "property": "age",
             "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "ageBetween17and21",
             "value": {
                 "type": "IVL_PQ",
                 "low": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "17"
+                    "value": "17",
+                    "inclusive?": true,
+                    "derived?": false
                 },
                 "high": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "21"
+                    "value": "21",
+                    "inclusive?": true,
+                    "derived?": false
                 }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
             }
         },
         "ageBetween22and29": {
             "title": "ageBetween22and29",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
             "property": "age",
             "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "ageBetween22and29",
             "value": {
                 "type": "IVL_PQ",
                 "low": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "22"
+                    "value": "22",
+                    "inclusive?": true,
+                    "derived?": false
                 },
                 "high": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "29"
+                    "value": "29",
+                    "inclusive?": true,
+                    "derived?": false
                 }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
             }
         },
         "ageBetween30and39": {
             "title": "ageBetween30and39",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
             "property": "age",
             "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "ageBetween30and39",
             "value": {
                 "type": "IVL_PQ",
                 "low": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "30"
+                    "value": "30",
+                    "inclusive?": true,
+                    "derived?": false
                 },
                 "high": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "39"
+                    "value": "39",
+                    "inclusive?": true,
+                    "derived?": false
                 }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
             }
         },
         "ageBetween40and49": {
-            "title": "ageBetween40and49",
+            "title": "Age",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
             "property": "age",
             "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "ageBetween40and49",
             "value": {
                 "type": "IVL_PQ",
                 "low": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "40"
+                    "value": "40",
+                    "inclusive?": true,
+                    "derived?": false
                 },
                 "high": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "49"
+                    "value": "49",
+                    "inclusive?": true,
+                    "derived?": false
                 }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
             }
         },
         "ageBetween50and59": {
-            "title": "ageBetween50and59",
+            "title": "Age",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
             "property": "age",
             "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "ageBetween50and59",
             "value": {
                 "type": "IVL_PQ",
                 "low": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "50"
+                    "value": "50",
+                    "inclusive?": true,
+                    "derived?": false
                 },
                 "high": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "59"
+                    "value": "59",
+                    "inclusive?": true,
+                    "derived?": false
                 }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
             }
         },
         "ageBetween60and64": {
-            "title": "dummyAge2",
+            "title": "Age",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
             "property": "age",
             "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "ageBetween60and64",
             "value": {
                 "type": "IVL_PQ",
                 "low": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "60"
+                    "value": "60",
+                    "inclusive?": true,
+                    "derived?": false
                 },
                 "high": {
                     "type": "PQ",
                     "unit": "a",
-                    "value": "64"
+                    "value": "64",
+                    "inclusive?": true,
+                    "derived?": false
+                }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
+            }
+        },
+        "dummyAge1": {
+            "title": "Age",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
+            "property": "age",
+            "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "dummyAge1",
+            "value": {
+                "type": "IVL_PQ",
+                "low": {
+                    "type": "PQ",
+                    "unit": "a",
+                    "value": "60",
+                    "inclusive?": true,
+                    "derived?": false
+                },
+                "high": {
+                    "type": "PQ",
+                    "unit": "a",
+                    "value": "64",
+                    "inclusive?": true,
+                    "derived?": false
                 }
             },
             "effective_time": {
                 "type": "IVL_TS",
                 "low": {
                     "type": "TS",
-                    "value": "20100101"
+                    "value": "20100101",
+                    "inclusive?": true,
+                    "derived?": false
+                },
+                "high": {
+                    "type": "TS",
+                    "value": "20111231",
+                    "inclusive?": true,
+                    "derived?": false
                 }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
+            }
+        },
+        "dummyAge2": {
+            "title": "Age",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
+            "property": "age",
+            "type": "characteristic",
+            "definition": "patient_characteristic_age",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "dummyAge2",
+            "value": {
+                "type": "IVL_PQ",
+                "low": {
+                    "type": "PQ",
+                    "unit": "a",
+                    "value": "60",
+                    "inclusive?": true,
+                    "derived?": false
+                },
+                "high": {
+                    "type": "PQ",
+                    "unit": "a",
+                    "value": "64",
+                    "inclusive?": true,
+                    "derived?": false
+                }
+            },
+            "effective_time": {
+                "type": "IVL_TS",
+                "low": {
+                    "type": "TS",
+                    "value": "20100101",
+                    "inclusive?": true,
+                    "derived?": false
+                }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "424144002"
+                ]
             }
         },
         "genderMale": {
-            "title": "genderMale",
+            "title": "Gender",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
             "property": "gender",
             "type": "characteristic",
+            "definition": "patient_characteristic_gender",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "genderMale",
             "value": {
                 "type": "CD",
                 "system": "2.16.840.1.113883.5.1",
                 "code": "M"
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "263495000"
+                ]
             }
         },
         "genderFemale": {
-            "title": "genderFemale",
+            "title": "Gender",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
             "property": "gender",
             "type": "characteristic",
+            "definition": "patient_characteristic_gender",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "genderFemale",
             "value": {
                 "type": "CD",
                 "system": "2.16.840.1.113883.5.1",
                 "code": "F"
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "263495000"
+                ]
             }
         },
         "EDorInpatientEncounter": {
             "title": "EDorInpatientEncounter",
-            "section": "encounters",
+            "standard_category": "encounter",
+            "qds_data_type": "encounter",
             "code_list_id": "2.16.840.1.113883.3.464.1.42",
-            "type": "encounter",
+            "children_criteria": [],
+            "type": "encounters",
+            "definition": "encounter",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "EDorInpatientEncounter",
             "effective_time": {
                 "type": "IVL_TS",
                 "high": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "EndDate.add(new PQ(-2,\"a\"))"
+                    "expression": "MeasurePeriod.high.add(new PQ(-2,'a'))"
                 }
             }
         },
         "AmbulatoryEncounter": {
             "title": "AmbulatoryEncounter",
-            "section": "encounters",
-            "subset_code": "PREVSUM",
+            "standard_category": "encounter",
+            "qds_data_type": "encounter",
             "code_list_id": "2.16.840.1.113883.3.464.1.1142",
-            "type": "encounter",
+            "children_criteria": [],
+            "type": "encounters",
+            "definition": "encounter",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "AmbulatoryEncounter",
             "effective_time": {
                 "type": "IVL_TS",
                 "high": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "EndDate.add(new PQ(-2,\"a\"))"
+                    "expression": "MeasurePeriod.high.add(new PQ(-2,'a'))"
                 }
             }
         },
-        "DummyProcedure": {
-            "title": "DummyProcedure",
-            "section": "procedures",
-            "type": "procedure",
-            "status": "completed",
+        "DummyLanguage_Arabic": {
+            "title": "Language",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
+            "property": "languages",
+            "type": "characteristic",
+            "definition": "patient_characteristic_languages",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DummyLanguage_Arabic",
+            "value": {
+                "type": "CD",
+                "system": "1.0.639.1",
+                "code": "ar"
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "102902016"
+                ]
+            }
+        },
+        "DummyMaritalStatus_Divorced": {
+            "title": "Marital Status",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
+            "property": "maritalStatus",
+            "type": "characteristic",
+            "definition": "patient_characteristic_marital_status",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DummyMaritalStatus_Divorced",
+            "value": {
+                "type": "CD",
+                "system": "2.16.840.1.113883.5.2",
+                "code": "D"
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "125680007"
+                ]
+            }
+        },
+        "DummyRace_Latin_American": {
+            "title": "Race",
+            "standard_category": "individual_characteristic",
+            "qds_data_type": "individual_characteristic",
+            "children_criteria": [],
+            "property": "race",
+            "type": "characteristic",
+            "definition": "patient_characteristic_race",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DummyRace_Latin_American",
+            "value": {
+                "type": "CD",
+                "system": "2.16.840.1.113883.6.238",
+                "code": "2178-2"
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "103579009"
+                ]
+            }
+        },
+        "DummyProcedureAfterHasDiabetes": {
+            "title": "DummyProcedureAfterHasDiabetes",
+            "standard_category": "procedure",
+            "qds_data_type": "procedure_performed",
+            "children_criteria": [],
+            "type": "procedures",
+            "definition": "procedure",
+            "status": "performed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DummyProcedureAfterHasDiabetes",
             "effective_time": {
                 "type": "IVL_TS",
                 "low": {
                     "type": "TS",
-                    "value": "20100101"
+                    "value": "20100101",
+                    "inclusive?": true,
+                    "derived?": false
                 },
                 "high": {
                     "type": "TS",
-                    "value": "20111231"
+                    "value": "20111231",
+                    "inclusive?": true,
+                    "derived?": false
                 }
             },
             "inline_code_list": {
-                "SNOMED-CT": ["127355002"]
-            }
+                "SNOMED-CT": [
+                    "127355002"
+                ]
+            },
+            "temporal_references": [
+                {
+                    "type": "SAS",
+                    "reference": "HasDiabetes",
+                    "range": {
+                        "type": "IVL_PQ",
+                        "high": {
+                            "type": "PQ",
+                            "unit": "a",
+                            "value": "1",
+                            "inclusive?": true,
+                            "derived?": false
+                        }
+                    }
+                }
+            ]
         },
-        "HasDiabetes": {
-            "title": "HasDiabetes",
-            "section": "conditions",
-            "code_list_id": "2.16.840.1.113883.3.464.1.37",
-            "type": "diagnosis",
-            "status": "completed"
-        },
-        "HasGestationalDiabetes": {
-            "title": "HasGestationalDiabetes",
-            "section": "conditions",
-            "code_list_id": "2.16.840.1.113883.3.464.1.67",
-            "type": "diagnosis",
+        "DummyProcedureBeforeMeasurePeriod": {
+            "title": "some kind of procedure",
+            "standard_category": "procedure",
+            "qds_data_type": "procedure_performed",
+            "children_criteria": [],
+            "type": "procedures",
+            "definition": "procedure",
+            "status": "performed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DummyProcedureBeforeMeasurePeriod",
             "effective_time": {
                 "type": "IVL_TS",
                 "low": {
                     "type": "TS",
-                    "derived?": true,
-                    "expression": "StartDate"
+                    "value": "20100101",
+                    "inclusive?": true,
+                    "derived?": false
                 },
                 "high": {
                     "type": "TS",
+                    "value": "20111231",
+                    "inclusive?": true,
+                    "derived?": false
+                }
+            },
+            "inline_code_list": {
+                "LOINC": [
+                    "127355002"
+                ]
+            },
+            "temporal_references": [
+                {
+                    "type": "SBS",
+                    "reference": "MeasurePeriod"
+                }
+            ]
+        },
+        "DummyProcedureAfterHasDiabetesAndBeforeEncounter": {
+            "title": "some kind of procedure",
+            "standard_category": "procedure",
+            "qds_data_type": "procedure_performed",
+            "children_criteria": [],
+            "type": "procedures",
+            "definition": "procedure",
+            "status": "performed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DummyProcedureAfterHasDiabetesAndBeforeEncounter",
+            "effective_time": {
+                "type": "IVL_TS",
+                "low": {
+                    "type": "TS",
+                    "value": "20100101",
+                    "inclusive?": true,
+                    "derived?": false
+                },
+                "high": {
+                    "type": "TS",
+                    "value": "20111231",
+                    "inclusive?": true,
+                    "derived?": false
+                }
+            },
+            "inline_code_list": {
+                "LOINC": [
+                    "127355002"
+                ]
+            },
+            "temporal_references": [
+                {
+                    "type": "SAS",
+                    "reference": "HasDiabetes",
+                    "range": {
+                        "type": "IVL_PQ",
+                        "high": {
+                            "type": "PQ",
+                            "unit": "a",
+                            "value": "-1",
+                            "inclusive?": true,
+                            "derived?": false
+                        }
+                    }
+                },
+                {
+                    "type": "SBS",
+                    "reference": "AmbulatoryEncounter"
+                }
+            ]
+        },
+        "DummyProcedureAfterHasDiabetesWithCount": {
+            "title": "DummyProcedureAfterHasDiabetesWithCount",
+            "standard_category": "procedure",
+            "qds_data_type": "procedure_performed",
+            "children_criteria": [],
+            "type": "procedures",
+            "definition": "procedure",
+            "status": "performed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DummyProcedureAfterHasDiabetesWithCount",
+            "effective_time": {
+                "type": "IVL_TS",
+                "low": {
+                    "type": "TS",
+                    "value": "20100101",
+                    "inclusive?": true,
+                    "derived?": false
+                },
+                "high": {
+                    "type": "TS",
+                    "value": "20111231",
+                    "inclusive?": true,
+                    "derived?": false
+                }
+            },
+            "inline_code_list": {
+                "SNOMED-CT": [
+                    "127355002"
+                ]
+            },
+            "temporal_references": [
+                {
+                    "type": "SAS",
+                    "reference": "HasDiabetes",
+                    "range": {
+                        "type": "IVL_PQ",
+                        "high": {
+                            "type": "PQ",
+                            "unit": "a",
+                            "value": "1",
+                            "inclusive?": true,
+                            "derived?": false
+                        }
+                    }
+                }
+            ],
+            "subset_operators": [
+                {
+                    "type": "SUMMARY",
+                    "value": {
+                        "type": "IVL_INT",
+                        "low": {
+                            "type": "PQ",
+                            "value": "2",
+                            "inclusive?": true,
+                            "derived?": false
+                        }
+                    }
+                }
+            ]
+        },
+        "anyDiabetes": {
+            "title": "anyDiabetes",
+            "standard_category": "",
+            "qds_data_type": "",
+            "children_criteria": [
+                "HasDiabetes",
+                "HasGestationalDiabetes",
+                "HasSteroidInducedDiabetes"
+            ],
+            "derivation_operator": "UNION",
+            "type": "derived",
+            "definition": "derived",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "anyDiabetes"
+        },
+        "allDiabetes": {
+            "title": "allDiabetes",
+            "standard_category": "",
+            "qds_data_type": "",
+            "children_criteria": [
+                "HasDiabetes",
+                "HasGestationalDiabetes",
+                "HasSteroidInducedDiabetes"
+            ],
+            "derivation_operator": "XPRODUCT",
+            "type": "derived",
+            "definition": "derived",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "allDiabetes"
+        },
+        "HasDiabetes": {
+            "title": "HasDiabetes",
+            "standard_category": "diagnosis_condition_problem",
+            "qds_data_type": "diagnosis_active",
+            "code_list_id": "2.16.840.1.113883.3.464.1.37",
+            "children_criteria": [],
+            "type": "conditions",
+            "definition": "diagnosis",
+            "status": "active",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "HasDiabetes"
+        },
+        "HasGestationalDiabetes": {
+            "title": "HasGestationalDiabetes",
+            "standard_category": "diagnosis_condition_problem",
+            "qds_data_type": "diagnosis_active",
+            "code_list_id": "2.16.840.1.113883.3.464.1.67",
+            "children_criteria": [],
+            "type": "conditions",
+            "definition": "diagnosis",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "HasGestationalDiabetes",
+            "effective_time": {
+                "type": "IVL_TS",
+                "low": {
+                    "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "EndDate"
+                    "expression": "MeasurePeriod.low"
+                },
+                "high": {
+                    "type": "TS",
+                    "inclusive?": true,
+                    "derived?": true,
+                    "expression": "MeasurePeriod.high"
                 }
             }
         },
         "HasPolycysticOvaries": {
             "title": "HasPolycysticOvaries",
-            "section": "conditions",
+            "standard_category": "diagnosis_condition_problem",
+            "qds_data_type": "diagnosis_active",
             "code_list_id": "2.16.840.1.113883.3.464.1.98",
-            "type": "diagnosis",
+            "children_criteria": [],
+            "type": "conditions",
+            "definition": "diagnosis",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "HasPolycysticOvaries",
             "effective_time": {
                 "type": "IVL_TS",
                 "low": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "StartDate.add(new PQ(-1,\"a\"))"
+                    "expression": "MeasurePeriod.low.add(new PQ(-1,'a'))"
                 },
                 "high": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "EndDate"
+                    "expression": "MeasurePeriod.high"
                 }
             }
         },
         "HasSteroidInducedDiabetes": {
             "title": "HasSteroidInducedDiabetes",
-            "section": "conditions",
+            "standard_category": "diagnosis_condition_problem",
+            "qds_data_type": "diagnosis_active",
             "code_list_id": "2.16.840.1.113883.3.464.1.113",
-            "type": "diagnosis",
+            "children_criteria": [],
+            "type": "conditions",
+            "definition": "diagnosis",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "HasSteroidInducedDiabetes",
             "effective_time": {
                 "type": "IVL_TS",
                 "low": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "StartDate"
+                    "expression": "MeasurePeriod.low"
                 },
                 "high": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "EndDate"
+                    "expression": "MeasurePeriod.high"
                 }
             }
         },
+        "HbA1CNotDone": {
+            "title": "HbA1CNotDone",
+            "standard_category": "laboratory_test",
+            "qds_data_type": "laboratory_test",
+            "code_list_id": "2.16.840.1.113883.3.464.1.72",
+            "children_criteria": [],
+            "type": "laboratory_tests",
+            "definition": "laboratory_test",
+            "status": "performed",
+            "hard_status": false,
+            "negation": true,
+            "negation_code_list_id": "1.2.3.4",
+            "source_data_criteria": "HbA1CNotDone"
+        },
         "HbA1C": {
             "title": "HbA1C",
-            "section": "results",
-            "subset_code": "RECENT",
+            "standard_category": "laboratory_test",
+            "qds_data_type": "laboratory_test",
             "code_list_id": "2.16.840.1.113883.3.464.1.72",
-            "type": "result",
-            "status": "completed",
+            "children_criteria": [],
+            "type": "laboratory_tests",
+            "definition": "laboratory_test",
+            "status": "performed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "HbA1C",
             "value": {
                 "type": "IVL_PQ",
                 "low": {
                     "type": "PQ",
                     "unit": "%",
-                    "value": "9"
+                    "value": "9",
+                    "inclusive?": true,
+                    "derived?": false
                 }
             }
         },
+        "DummyInlineCodedResult": {
+            "title": "DummyInlineCodedResult",
+            "standard_category": "laboratory_test",
+            "qds_data_type": "laboratory_test",
+            "code_list_id": "2.16.840.1.113883.3.464.1.72",
+            "children_criteria": [],
+            "type": "laboratory_tests",
+            "definition": "laboratory_test",
+            "status": "performed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DummyInlineCodedResult",
+            "value": {
+                "type": "CD",
+                "system": "1.2.3.4",
+                "code": "xyzzy"
+            }
+        },
+        "DummyExternalCodedResult": {
+            "title": "DummyExternalCodedResult",
+            "standard_category": "laboratory_test",
+            "qds_data_type": "laboratory_test",
+            "code_list_id": "2.16.840.1.113883.3.464.1.72",
+            "children_criteria": [],
+            "type": "laboratory_tests",
+            "definition": "laboratory_test",
+            "status": "performed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DummyExternalCodedResult",
+            "value": {
+                "type": "CD",
+                "code_list_id": "1.2.3.4"
+            }
+        },
+        "moreThanTwoHbA1CTests": {
+            "title": "moreThanTwoHbA1CTests",
+            "standard_category": "laboratory_test",
+            "qds_data_type": "laboratory_test",
+            "code_list_id": "2.16.840.1.113883.3.464.1.72",
+            "children_criteria": [],
+            "type": "laboratory_tests",
+            "definition": "laboratory_test",
+            "status": "performed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "moreThanTwoHbA1CTests",
+            "subset_operators": [
+                {
+                    "type": "COUNT",
+                    "value": {
+                        "type": "IVL_INT",
+                        "low": {
+                            "type": "PQ",
+                            "value": "3",
+                            "inclusive?": true,
+                            "derived?": false
+                        }
+                    }
+                }
+            ]
+        },
+        "moreThanFourHbA1CTests": {
+            "title": "moreThanFourHbA1CTests",
+            "standard_category": "laboratory_test",
+            "qds_data_type": "laboratory_test",
+            "code_list_id": "2.16.840.1.113883.3.464.1.72",
+            "children_criteria": [],
+            "type": "laboratory_tests",
+            "definition": "laboratory_test",
+            "status": "performed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "moreThanFourHbA1CTests",
+            "subset_operators": [
+                {
+                    "type": "COUNT",
+                    "value": {
+                        "type": "IVL_INT",
+                        "low": {
+                            "type": "PQ",
+                            "value": "5",
+                            "inclusive?": true,
+                            "derived?": false
+                        }
+                    }
+                }
+            ]
+        },
         "DiabetesMedAdministered": {
             "title": "DiabetesMedAdministered",
-            "section": "medications",
+            "standard_category": "medication",
+            "qds_data_type": "medication_active",
             "code_list_id": "2.16.840.1.113883.3.464.1.94",
-            "type": "medication",
+            "children_criteria": [],
+            "type": "medications",
+            "definition": "medication",
+            "status": "active",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DiabetesMedAdministered",
             "effective_time": {
                 "type": "IVL_TS",
                 "low": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "StartDate.add(new PQ(-2,\"a\"))"
+                    "expression": "MeasurePeriod.low.add(new PQ(-2,'a'))"
+                }
+            }
+        },
+        "DiabetesMedAdministeredFor7Days": {
+            "title": "DiabetesMedAdministered",
+            "standard_category": "medication",
+            "qds_data_type": "medication_active",
+            "code_list_id": "2.16.840.1.113883.3.464.1.94",
+            "children_criteria": [],
+            "type": "medications",
+            "definition": "medication",
+            "status": "active",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DiabetesMedAdministered",
+            "field_values" : {
+                "CUMULATIVE_MEDICATION_DURATION" : {
+                    "type": "IVL_PQ",
+                    "low": {
+                        "type": "PQ",
+                        "value": 5,
+                        "inclusive?": true,
+                        "derived?": false
+                    },
+                    "high": {
+                        "type": "PQ",
+                        "value": 7,
+                        "inclusive?": true,
+                        "derived?": false
+                    }
+                }
+            },
+            "effective_time": {
+                "type": "IVL_TS",
+                "low": {
+                    "type": "TS",
+                    "inclusive?": true,
+                    "derived?": true,
+                    "expression": "MeasurePeriod.low.add(new PQ(-2,'a'))"
+                }
+            }
+        },
+        "DiabetesMedAdministeredFor9Days": {
+            "title": "DiabetesMedAdministered",
+            "standard_category": "medication",
+            "qds_data_type": "medication_active",
+            "code_list_id": "2.16.840.1.113883.3.464.1.94",
+            "children_criteria": [],
+            "type": "medications",
+            "definition": "medication",
+            "status": "active",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DiabetesMedAdministered",
+            "field_values" : {
+                "CUMULATIVE_MEDICATION_DURATION" : {
+                    "type": "IVL_PQ",
+                    "low": {
+                        "type": "PQ",
+                        "value": 8,
+                        "inclusive?": true,
+                        "derived?": false
+                    },
+                    "high": {
+                        "type": "PQ",
+                        "value": 9,
+                        "inclusive?": true,
+                        "derived?": false
+                    }
+                }
+            },
+            "effective_time": {
+                "type": "IVL_TS",
+                "low": {
+                    "type": "TS",
+                    "inclusive?": true,
+                    "derived?": true,
+                    "expression": "MeasurePeriod.low.add(new PQ(-2,'a'))"
                 }
             }
         },
         "DiabetesMedIntended": {
             "title": "DiabetesMedIntended",
-            "section": "medications",
+            "standard_category": "medication",
+            "qds_data_type": "medication_active",
             "code_list_id": "2.16.840.1.113883.3.464.1.94",
-            "type": "medication",
+            "children_criteria": [],
+            "type": "medications",
+            "definition": "medication",
+            "status": "active",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DiabetesMedIntended",
             "effective_time": {
                 "type": "IVL_TS",
                 "high": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "EndDate.add(new PQ(-2,\"a\"))"
+                    "expression": "MeasurePeriod.high.add(new PQ(-2,'a'))"
                 }
             }
         },
         "DiabetesMedSupplied": {
             "title": "DiabetesMedSupplied",
-            "section": "medications",
+            "standard_category": "medication",
+            "qds_data_type": "medication_dispensed",
             "code_list_id": "2.16.840.1.113883.3.464.1.94",
-            "type": "medication",
+            "children_criteria": [],
+            "type": "medications",
+            "definition": "medication",
+            "status": "dispensed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DiabetesMedSupplied",
             "effective_time": {
                 "type": "IVL_TS",
                 "high": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "EndDate.add(new PQ(-2,\"a\"))"
+                    "expression": "MeasurePeriod.high.add(new PQ(-2,'a'))"
                 }
             }
         },
         "DiabetesMedOrdered": {
             "title": "DiabetesMedOrdered",
-            "section": "medications",
+            "standard_category": "medication",
+            "qds_data_type": "medication_dispensed",
             "code_list_id": "2.16.840.1.113883.3.464.1.94",
-            "type": "medication",
+            "children_criteria": [],
+            "type": "medications",
+            "definition": "medication",
+            "status": "dispensed",
+            "hard_status": false,
+            "negation": false,
+            "source_data_criteria": "DiabetesMedOrdered",
             "effective_time": {
                 "type": "IVL_TS",
                 "high": {
                     "type": "TS",
+                    "inclusive?": true,
                     "derived?": true,
-                    "expression": "EndDate.add(new PQ(-2,\"a\"))"
+                    "expression": "MeasurePeriod.high.add(new PQ(-2,'a'))"
                 }
             }
         }
     },
+    "source_data_criteria": {},
+    "populations": [
+        {
+            "IPP": "IPP",
+            "DENOM": "DENOM",
+            "NUMER": "NUMER",
+            "DENEXCEP": "DENEXCEP",
+            "id": "Population1",
+            "title": "Population Criteria Section"
+        }
+    ],
     "measure_period": {
         "type": "IVL_TS",
         "low": {
             "type": "TS",
-            "value": "20110101"
+            "value": "20110101",
+            "inclusive?": true,
+            "derived?": false
         },
         "high": {
             "type": "TS",
-            "value": "20111231"
-        },
-        "width": {
-            "type": "PQ",
-            "unit": "a",
-            "value": "1"
+            "value": "20111231",
+            "inclusive?": true,
+            "derived?": false
         }
     }
 }

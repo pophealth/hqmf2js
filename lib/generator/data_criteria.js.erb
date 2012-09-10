@@ -18,6 +18,12 @@ hqmfjs.<%= js_name(criteria) %> = function(patient) {
     <%- if criteria.value -%>
   events = filterEventsByValue(events, <%= js_for_bounds(criteria.value) %>);
     <%- end -%>
+    <%- if criteria.field_values.present?
+          criteria.field_values.keys.each do |field|
+      -%>
+  events = filterEventsByField(events, "<%= field_method(field) %>", <%= js_for_bounds(criteria.field_values[field]) %>);
+    <%-   end
+        end -%>
     <%- if criteria.temporal_references and criteria.temporal_references.length > 0 -%>
       <%- criteria.temporal_references.each do |temporal_reference| -%>
   events = <%= temporal_reference.type %>(events, hqmfjs.<%= temporal_reference.reference.id %>(patient)<%= ", #{js_for_bounds(temporal_reference.range)}" if temporal_reference.range %>);

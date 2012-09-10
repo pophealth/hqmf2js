@@ -536,4 +536,9 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert !@context.eval("MIN(#{events2},#{between15and25}).isTrue()")
     assert @context.eval("MAX(#{events2},#{between15and25}).isTrue()")
   end
+  
+  def test_respond_to
+    assert @context.eval("(new hQuery.Allergy({})).respondTo('severity')")
+    assert !@context.eval("(new hQuery.Allergy({})).respondTo('canHasCheeseburger')")
+  end
 end
