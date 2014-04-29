@@ -5,7 +5,6 @@ gem 'rails', '3.2.14'
 group :assets do
   gem 'sass-rails'
   gem 'coffee-rails'
-  gem 'uglifier'
 end
 
 gem 'hquery-patient-api', '1.0.4'

@@ -416,6 +416,11 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal 1, @context.eval('OVERLAP(events2, XPRODUCT(bound1))').count
     assert_equal 0, @context.eval('OVERLAP(events2, XPRODUCT(bound2))').count
     
+    # SCW
+    assert_equal 1, @context.eval('SCW(events1, bound1)').count
+    assert_equal 0, @context.eval('SCW(events1, bound6)').count
+    assert_equal 0, @context.eval('SCW(events1, bound2)').count
+
     # SBS
     assert_equal 0, @context.eval('SBS(events1, bound1)').count
     assert_equal 0, @context.eval('SBS(events2, bound1, range1)').count
@@ -423,12 +428,38 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal 1, @context.eval('SBS(events2, bound1, range2)').count
     assert_equal 0, @context.eval('SBS(events3, bound7, range3)').count
     
+    #SBCW
+    assert_equal 1, @context.eval('SBCW(events1, bound1)').count
+    assert_equal 0, @context.eval('SBCW(events2, bound1, range1)').count
+    assert_equal 1, @context.eval('SBCW(events2, bound1)').count
+    assert_equal 1, @context.eval('SBCW(events2, bound1, range2)').count
+    assert_equal 0, @context.eval('SBCW(events3, bound7, range3)').count
+    assert_equal 0, @context.eval('SBCW(events1, bound6)').count
+    assert_equal 1, @context.eval('SBCW(events1, bound2)').count
+
     # SAS
     assert_equal 0, @context.eval('SAS(events1, bound1)').count
     assert_equal 0, @context.eval('SAS(events2, bound1, range1)').count
     assert_equal 0, @context.eval('SAS(events2, bound1)').count
     assert_equal 0, @context.eval('SAS(events2, bound1, range2)').count
     
+    #SACW
+    assert_equal 1, @context.eval('SACW(events1, bound1)').count
+    assert_equal 0, @context.eval('SACW(events2, bound1, range1)').count
+    assert_equal 0, @context.eval('SACW(events2, bound1)').count
+    assert_equal 0, @context.eval('SACW(events2, bound1, range2)').count
+    assert_equal 0, @context.eval('SACW(events1, bound6)').count
+    assert_equal 0, @context.eval('SACW(events1, bound2)').count
+
+
+    # SBDU
+    assert_equal 0, @context.eval('SBDU(events2, bound1, range1)').count
+    assert_equal 1, @context.eval('SBDU(events2, bound1)').count
+    assert_equal 1, @context.eval('SBDU(events2, bound1, range2)').count
+    assert_equal 0, @context.eval('SBDU(events3, bound7, range3)').count
+    assert_equal 1, @context.eval('SBDU(events1, bound1)').count
+    assert_equal 1, @context.eval('SBDU(events1, bound2)').count
+
     # SBE
     assert_equal 0, @context.eval('SBE(events1, bound1)').count
     assert_equal 1, @context.eval('SBE(events1, bound2)').count
@@ -466,10 +497,30 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal 1, @context.eval('ECW(events1, bound6)').count
     assert_equal 0, @context.eval('ECW(events1, bound2)').count
     
-    # SCW
-    assert_equal 1, @context.eval('SCW(events1, bound1)').count
-    assert_equal 0, @context.eval('SCW(events1, bound6)').count
-    assert_equal 0, @context.eval('SCW(events1, bound2)').count
+    #EBCW
+    assert_equal 1, @context.eval('ECW(events1, bound1)').count
+    assert_equal 1, @context.eval('ECW(events1, bound6)').count
+    assert_equal 0, @context.eval('ECW(events1, bound2)').count
+    assert_equal 0, @context.eval('EBE(events1, bound1)').count
+    assert_equal 1, @context.eval('EBE(events1, bound2)').count
+    
+    #EBCWS
+    assert_equal 0, @context.eval('EBS(events1, bound1)').count
+    assert_equal 1, @context.eval('EBS(events1, bound2)').count
+
+    #EACW
+    assert_equal 1, @context.eval('EACW(events1, bound1)').count
+    assert_equal 1, @context.eval('EACW(events1, bound6)').count
+    assert_equal 0, @context.eval('EACW(events1, bound2)').count
+    assert_equal 1, @context.eval('EACW(bound3, events2)').count
+    
+    #EACWS
+    assert_equal 1, @context.eval('EACWS(events1, bound1)').count
+    assert_equal 1, @context.eval('EACWS(events1, bound3)').count
+  
+    #EBDU
+    assert_equal 1, @context.eval('EBDU(events1, bound1)').count
+    assert_equal 1, @context.eval('EBDU(events1, bound2)').count
     
     # ECWS
     assert_equal 1, @context.eval('ECWS(events1, bound1)').count
@@ -481,6 +532,17 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal 1, @context.eval('SCWE(events1, bound6)').count
     assert_equal 0, @context.eval('SCWE(events1, bound2)').count
     
+    # SBCWE
+    assert_equal 1, @context.eval('SBCWE(events1, bound1)').count
+    assert_equal 1, @context.eval('SBCWE(events1, bound6)').count
+    assert_equal 1, @context.eval('SBCWE(events1, bound2)').count
+    
+    # SACWE
+    assert_equal 1, @context.eval('SACWE(events1, bound1)').count
+    assert_equal 1, @context.eval('SACWE(events1, bound6)').count
+    assert_equal 0, @context.eval('SACWE(events1, bound2)').count
+    assert_equal 1, @context.eval('SACWE(bound2, events1)').count
+
     # CONCURRENT
     assert_equal 1, @context.eval('CONCURRENT(events1, bound1)').count
     assert_equal 0, @context.eval('CONCURRENT(events1, bound2)').count

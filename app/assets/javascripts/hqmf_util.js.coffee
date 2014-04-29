@@ -332,14 +332,55 @@ class IVL_TS
       @low.after(other.high)
     else
       false
-      
+
+  # Starts During: this low is between other low and high
+  SDU: (other) -> 
+    if @low && other.low && other.high
+      @low.afterOrConcurrent(other.low) && @low.beforeOrConcurrent(other.high)
+    else
+      false
+
+  #starts before or during: this low is less than the other low or the other high. 
+  #if other does not have a high or does not have a low this will return false
+  SBDU: (other) ->
+     this.SBS(other) ||  this.SDU(other)
+
+  # Starts Concurrent With: this low is the same as other low ignoring seconds
+  SCW: (other) -> 
+    if @low && other.low
+      @low.asDate() && other.low.asDate() && @low.withinSameMinute(other.low)
+    else
+      false
+
+   # Starts Concurrent With End: this low is the same as other high ignoring seconds
+  SCWE: (other) -> 
+    if @low && other.high
+      @low.asDate() && other.high.asDate() && @low.withinSameMinute(other.high)
+    else
+      false
+
+    #Starts Before or Concurrent with: this low is <= other low
+  SBCW: (other) ->
+     this.SBS(other) ||  this.SCW(other)  
+
+  SBCWE: (other) -> 
+     this.SBE(other) ||  this.SCWE(other)
+  # Starts After or Concurrent with other: this low is >= other low
+  SACW: (other) ->
+     this.SAS(other) ||  this.SCW(other)
+
+  # Starts After or Concurrent with End : This low is >= other high
+  SACWE: (other) ->
+     this.SAE(other) ||  this.SCWE(other)   
+
+
   # Ends Before Start: this high is before other low
   EBS: (other) ->
     if @high && other.low
       @high.before(other.low)
     else
       false
-      
+
   # Ends After Start: this high is after other low
   EAS: (other) -> 
     if @high && other.low
@@ -360,14 +401,7 @@ class IVL_TS
       @high.after(other.high)
     else
       false
-      
-  # Starts During: this low is between other low and high
-  SDU: (other) -> 
-    if @low && other.low && other.high
-      @low.afterOrConcurrent(other.low) && @low.beforeOrConcurrent(other.high)
-    else
-      false
-      
+
   # Ends During: this high is between other low and high
   EDU: (other) -> 
     if @high && other.low && other.high
@@ -382,26 +416,27 @@ class IVL_TS
     else
       false
       
-  # Starts Concurrent With: this low is the same as other low ignoring seconds
-  SCW: (other) -> 
-    if @low && other.low
-      @low.asDate() && other.low.asDate() && @low.withinSameMinute(other.low)
-    else
-      false
-      
   # Ends Concurrent With Start: this high is the same as other low ignoring seconds
   ECWS: (other) ->
     if @high && other.low
       @high.asDate() && other.low.asDate() && @high.withinSameMinute(other.low)
     else
       false
-      
-  # Starts Concurrent With End: this low is the same as other high ignoring seconds
-  SCWE: (other) -> 
-    if @low && other.high
-      @low.asDate() && other.high.asDate() && @low.withinSameMinute(other.high)
-    else
-      false
+
+  EBDU: (other) ->
+     this.EBS(other) ||  this.EDU(other)
+
+  EBCW: (other) ->
+     this.EBE(other) ||  this.ECW(other)
+
+  EACW: (other) ->
+     this.EAE(other) ||  this.ECW(other)  
+
+  EBCWS: (other) ->
+     this.EBS(other) ||  this.ECWS(other)
+
+  EACWS: (other) ->  
+     this.EAS(other) ||  this.ECWS(other)
 
   equals: (other) ->
     (@low==null && other.low==null) || (@low.equals(other.low)) && (@high==null && other.high==null) || (@high.equals(other.high))
@@ -636,6 +671,16 @@ eventAccessor = {
   'SCW': 'low',
   'ECWS': 'high'
   'SCWE': 'low',
+  'SBCW': 'low',
+  'SBCWE': 'low',
+  'SACW': 'low',
+  'SACWE': 'low',
+  'SBDU': 'low',
+  'EBCW': 'high',
+  'EBCWS': 'high',
+  'EACW': 'high',
+  'EACWS': 'high',
+  'EADU': 'high',
   'CONCURRENT': 'low',
   'DATEDIFF': 'low'
 }
@@ -657,6 +702,16 @@ boundAccessor = {
   'SCW': 'low',
   'ECWS': 'low'
   'SCWE': 'high',
+  'SBCW': 'low',
+  'SBCWE': 'high',
+  'SACW': 'low',
+  'SACWE': 'high',
+  'SBDU': 'high',
+  'EBCW': 'high',
+  'EBCWS': 'low',
+  'EACW': 'high',
+  'EACWS': 'low',
+  'EADU': 'low',
   'CONCURRENT': 'low',
   'DATEDIFF': 'low'
 }
@@ -784,6 +839,45 @@ ECWS = (events, bounds, offset) ->
 SCWE = (events, bounds, offset) ->
   eventsMatchBounds(events, bounds, "SCWE", offset)
 @SCWE = SCWE
+
+EBDU = (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "EBDU", offset)
+@EBDU = EBDU
+
+EBCW = (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "EBCW", offset)
+@EBCW = EBCW
+EACW = (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "EACW", offset)
+@EACW =EACW
+
+EBCWS = (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "EBCWS", offset)
+@EBCWS = EBCWS
+
+EACWS = (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "EACWS", offset)
+@EACWS = EACWS
+
+SBDU= (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "SBDU", offset)
+@SBDU = SBDU
+
+SBCW= (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "SBCW", offset)
+@SBCW = SBCW
+
+SBCWE= (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "SBCWE", offset)
+@SBCWE = SBCWE
+
+SACW= (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "SACW", offset)
+@SACW = SACW
+
+SACWE= (events, bounds, offset) ->
+  eventsMatchBounds(events, bounds, "SACWE", offset)
+@SACWE = SACWE
 
 CONCURRENT = (events, bounds, offset) ->
   eventsMatchBounds(events, bounds, "CONCURRENT", offset)
