@@ -437,7 +437,7 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal 0, @context.eval('OVERLAP(events2, XPRODUCT(bound6))').count
     assert_equal 1, @context.eval('OVERLAP(events2, XPRODUCT(bound1))').count
     assert_equal 0, @context.eval('OVERLAP(events2, XPRODUCT(bound2))').count
-    ## Overlap with null endins
+    ## Overlap with null ending
     assert_equal 1, @context.eval('OVERLAP(events4, bound1)').count
     assert_equal 0, @context.eval('OVERLAP(events5, bound8)').count
     
