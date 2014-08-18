@@ -361,6 +361,9 @@ class LibraryFunctionTest < Test::Unit::TestCase
     @context.eval('var events1 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105"), new TS("20120105"));}}]')
     @context.eval('var events2 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120102"), new TS("20120105"));}}]')
     @context.eval('var events3 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105203030"), new TS("20120105203030"));}}]')
+    @context.eval('var nullEndEvent = new IVL_TS(new TS("20110101"), new TS("20120105"));')
+    @context.eval('nullEndEvent.high.date = null;')
+    @context.eval('var events4 = [{"asIVL_TS": function() {return nullEndEvent;}}]')
     @context.eval('var bound1 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105"), new TS("20120105"));}}]')
     @context.eval('var bound2 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120107"), new TS("20120107"));}}]')
     @context.eval('var bound3 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120103"), new TS("20120107"));}}]')
@@ -430,6 +433,7 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal 0, @context.eval('OVERLAP(events2, XPRODUCT(bound6))').count
     assert_equal 1, @context.eval('OVERLAP(events2, XPRODUCT(bound1))').count
     assert_equal 0, @context.eval('OVERLAP(events2, XPRODUCT(bound2))').count
+    assert_equal 1, @context.eval('OVERLAP(events4, bound1)').count
     
     # SCW
     assert_equal 1, @context.eval('SCW(events1, bound1)').count
