@@ -301,12 +301,12 @@ class IVL_TS
   
   # Overlap: this overlaps with other
   OVERLAP: (other) -> 
-    if @high.date && other.high.date == null
+    if @high.date == null && other.high.date == null
       true # If neither have ends, they inherently overlap on the timeline
     else if @high.date == null
       this.SBS(other)
     else if other.high.date == null
-      this.SBS(other) && !this.EBS(other)
+      this.SBS(other) && this.EAS(other)
     else
       this.SDU(other) || this.EDU(other) || (this.SBS(other) && this.EAE(other))
   
