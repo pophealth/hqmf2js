@@ -300,7 +300,11 @@ class IVL_TS
   DURING: (other) -> this.SDU(other) && this.EDU(other)
   
   # Overlap: this overlaps with other
-  OVERLAP: (other) -> this.SDU(other) || this.EDU(other) || (this.SBS(other) && this.EAE(other))
+  OVERLAP: (other) -> 
+    if @high.date && other.high.date
+      this.SDU(other) || this.EDU(other) || (this.SBS(other) && this.EAE(other))
+    else
+      this.SDU(other) || this.EDU(other) || this.SBS(other)
   
   # Concurrent: this low and high are the same as other low and high
   CONCURRENT: (other) -> this.SCW(other) && this.ECW(other)
