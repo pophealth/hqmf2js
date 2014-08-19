@@ -304,9 +304,9 @@ class IVL_TS
     if @high.date == null && other.high.date == null
       true # If neither have ends, they inherently overlap on the timeline
     else if @high.date == null
-      this.SBS(other)
+      !this.SAE(other)
     else if other.high.date == null
-      this.SBS(other) && this.EAS(other)
+      !this.EBS(other)
     else
       this.SDU(other) || this.EDU(other) || (this.SBS(other) && this.EAE(other))
   
