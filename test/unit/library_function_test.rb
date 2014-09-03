@@ -570,6 +570,11 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal true, @context.eval('DATEDIFF([diffEvent1,diffEvent2],range4).isTrue()')
     assert_equal true, @context.eval('DATEDIFF([diffEvent2,diffEvent1],range4).isTrue()')
     assert_equal true, @context.eval('DATEDIFF([diffEvent1,diffEvent1],range4).isTrue()')
+
+    assert_equal true, @context.eval('DATETIMEDIFF([diffEvent1,diffEvent2],range4).isTrue()')
+    assert_equal true, @context.eval('DATETIMEDIFF([diffEvent2,diffEvent1],range4).isTrue()')
+    assert_equal true, @context.eval('DATETIMEDIFF([diffEvent1,diffEvent1],range4).isTrue()')
+
     
     # false test
     

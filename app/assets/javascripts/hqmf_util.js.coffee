@@ -1044,6 +1044,13 @@ TIMEDIFF = (events, range, initialSpecificContext) ->
   results
 @TIMEDIFF = TIMEDIFF
 
+DATETIMEDIFF = (events, range, initialSpecificContext) ->
+  if range
+    DATEDIFF(events, range)
+  else
+    TIMEDIFF(events, range, initialSpecificContext)
+@DATETIMEDIFF = DATETIMEDIFF
+
 @OidDictionary = {};
 
 hqmfjs = hqmfjs||{}
