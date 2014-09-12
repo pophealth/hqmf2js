@@ -361,6 +361,12 @@ class LibraryFunctionTest < Test::Unit::TestCase
     @context.eval('var events1 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105"), new TS("20120105"));}}]')
     @context.eval('var events2 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120102"), new TS("20120105"));}}]')
     @context.eval('var events3 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105203030"), new TS("20120105203030"));}}]')
+    @context.eval('var nullEndEvent = new IVL_TS(new TS("20110101"), new TS("20120105"));')
+    @context.eval('nullEndEvent.high.date = null;')
+    @context.eval('var events4 = [{"asIVL_TS": function() {return nullEndEvent;}}]')
+    @context.eval('var events5 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20140101"), new TS("20140201"));}}]')
+    @context.eval('var events6 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20101101"), new TS("20110101"));}}]')
+    @context.eval('var events7 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20110101"), new TS("20110201"));}}]')
     @context.eval('var bound1 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105"), new TS("20120105"));}}]')
     @context.eval('var bound2 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120107"), new TS("20120107"));}}]')
     @context.eval('var bound3 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120103"), new TS("20120107"));}}]')
@@ -368,8 +374,11 @@ class LibraryFunctionTest < Test::Unit::TestCase
     @context.eval('var bound5 = {"asIVL_TS": function() {return new IVL_TS(new TS("20120106"), new TS("20120107"));}}')
     @context.eval('var nullStartBound = new IVL_TS(new TS("20120105"), new TS("20120105"));')
     @context.eval('nullStartBound.low.date = null;')
+    @context.eval('var nullEndBound = new IVL_TS(new TS("20140601"), new TS("20140601"));')
+    @context.eval('nullEndBound.high.date = null;')
     @context.eval('var bound6 = {"asIVL_TS": function() {return nullStartBound;}}')
     @context.eval('var bound7 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105193030"), new TS("20120105193030"));}}]')
+    @context.eval('var bound8 = {"asIVL_TS": function() {return nullEndBound;}}')
     @context.eval('var range1 = new IVL_PQ(null, new PQ(1, "d"))')
     @context.eval('var range2 = new IVL_PQ(new PQ(1, "d"), null)')
     @context.eval('var range3 = new IVL_PQ(new PQ(0, "d"), null)')
@@ -430,6 +439,12 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal 0, @context.eval('OVERLAP(events2, XPRODUCT(bound6))').count
     assert_equal 1, @context.eval('OVERLAP(events2, XPRODUCT(bound1))').count
     assert_equal 0, @context.eval('OVERLAP(events2, XPRODUCT(bound2))').count
+    ## Overlap with null ending
+    assert_equal 1, @context.eval('OVERLAP(events4, bound8)').count
+    assert_equal 1, @context.eval('OVERLAP(events4, bound1)').count
+    assert_equal 0, @context.eval('OVERLAP(events5, bound8)').count
+    assert_equal 1, @context.eval('OVERLAP(events6, events4)').count
+    assert_equal 1, @context.eval('OVERLAP(events4, events7)').count
     
     # SCW
     assert_equal 1, @context.eval('SCW(events1, bound1)').count
@@ -570,6 +585,11 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal true, @context.eval('DATEDIFF([diffEvent1,diffEvent2],range4).isTrue()')
     assert_equal true, @context.eval('DATEDIFF([diffEvent2,diffEvent1],range4).isTrue()')
     assert_equal true, @context.eval('DATEDIFF([diffEvent1,diffEvent1],range4).isTrue()')
+
+    assert_equal true, @context.eval('DATETIMEDIFF([diffEvent1,diffEvent2],range4).isTrue()')
+    assert_equal true, @context.eval('DATETIMEDIFF([diffEvent2,diffEvent1],range4).isTrue()')
+    assert_equal true, @context.eval('DATETIMEDIFF([diffEvent1,diffEvent1],range4).isTrue()')
+
     
     # false test
     
