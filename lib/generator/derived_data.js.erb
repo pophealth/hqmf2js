@@ -3,7 +3,10 @@
     <%= "hqmfjs.#{child}(patient, initialSpecificContext)" %><%= "," if index<criteria.children_criteria.length-1 %>
     <%- end -%>
   );
-  <% if criteria.variable %>
+  <%- if criteria.variable -%>
   // record the result of the source of the variable to the rationale
   if(Logger.enable_rationale) Logger.record('<%=criteria.source_data_criteria%>',events);
-  <% end %>
+  <%- if criteria.specific_occurrence -%>
+  events.specific_occurrence = '<%= criteria.source_data_criteria%>';
+  <%- end -%>
+  <%- end -%>

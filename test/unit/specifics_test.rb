@@ -224,6 +224,29 @@ class SpecificsTest < Test::Unit::TestCase
     @context.eval("timediffs.length").must_equal 1
     @context.eval("timediffs[0]").must_equal 10
   end
+
+  def test_specifics_datetimediff
+    init_rows = "
+      var row1 = new Row('OccurrenceAEncounter',{'OccurrenceAEncounter':{'id':1},'OccurrenceBEncounter':{'id':20}});
+      var row2 = new Row('OccurrenceAEncounter',{'OccurrenceAEncounter':{'id':2},'OccurrenceBEncounter':{'id':20}});
+      var row3 = new Row('OccurrenceAEncounter',{'OccurrenceAEncounter':{'id':3},'OccurrenceBEncounter':{'id':30}});
+      
+      var specific = new hqmf.SpecificOccurrence([row1,row2,row3]);
+      
+      var ts1 = new TS('20100101100000');
+      var ts2 = new TS('20100101101000');
+      
+      var events1 = [{'id': 1, 'asTS': function() {return ts1;}}];
+      events1.specific_occurrence = 'OccurrenceAEncounter';
+      var events2 = [{'id': 20, 'asTS': function() {return ts2;}},{'id': 30, 'asTS': function() {return ts2;}}];
+      events2.specific_occurrence = 'OccurrenceBEncounter';
+      var timediffs = DATETIMEDIFF(XPRODUCT(events1, events2), null, specific);
+    "
+    
+    @context.eval(init_rows)
+    @context.eval("timediffs.length").must_equal 1
+    @context.eval("timediffs[0]").must_equal 10
+  end
   
   def test_specifics_event_counting
     

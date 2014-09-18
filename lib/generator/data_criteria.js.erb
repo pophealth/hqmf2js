@@ -40,7 +40,7 @@ hqmfjs.<%= js_name(criteria) %> = function(patient, initialSpecificContext) {
     <%- end -%>
     <%- if criteria.subset_operators -%>
       <%- criteria.subset_operators.select {|subset_operator| subset_operator.type}.each do |subset_operator| -%>
-  events = <%= subset_operator.type %>(events<%= ", #{js_for_bounds(subset_operator.value)}" if subset_operator.value %>, initialSpecificContext);
+  events = <%= subset_operator.type %>(events<%= if subset_operator.value then ", #{js_for_bounds(subset_operator.value)}"; elsif subset_operator.type == 'DATETIMEDIFF' then ", null"; end  %>, initialSpecificContext);
       <%- end # each operator -%>
     <%- end # subset operators -%>
   return events;
