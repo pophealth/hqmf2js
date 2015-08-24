@@ -46,14 +46,16 @@ module HQMF2JS
         HQMF::DataCriteria::FIELDS[field_name][:coded_entry_method].to_s.camelize(:lower)
       end
       
-      def field_library_method(field_name)
+      def field_library_method(field_name, value=nil)
         field_type = HQMF::DataCriteria::FIELDS[field_name][:field_type]
-        if field_type == :value
+        if field_type == :value || !value.nil? && value.type == 'IVL_TS'
           'filterEventsByField'
         elsif field_type == :timestamp
           'adjustBoundsForField'
         elsif field_type == :nested_timestamp
           'denormalizeEventsByLocation'
+       elsif field_type == :reference
+          'filterEventsByReference'
         end
       end
 
@@ -79,6 +81,8 @@ module HQMF2JS
               else
                 "new PQ(#{value.value}, null, #{value.inclusive?})"
               end
+            elsif value.type=='TS'
+              "new TS(\"#{value.value}\", #{value.inclusive?})"
             elsif value.type=='ANYNonNull'
               "new #{value.type}()"
             elsif value.respond_to?(:unit) && value.unit != nil
@@ -96,8 +100,11 @@ module HQMF2JS
 
       def js_for_bounds(bounds)
         if (bounds.respond_to?(:low) && bounds.respond_to?(:high))
-          "new IVL_PQ(#{js_for_value(bounds.low)}, #{js_for_value(bounds.high)})"
-        else
+          type = bounds.type || 'IVL_PQ'
+          "new #{type}(#{js_for_value(bounds.low)}, #{js_for_value(bounds.high)})"
+        elsif bounds.respond_to?(:reference) 
+          "hqmfjs.#{bounds.reference.gsub(/\W/, '_')}(patient,initialSpecificContext)"
+        else  
           "#{js_for_value(bounds)}"
         end
       end
@@ -223,6 +230,7 @@ module HQMF2JS
         #{js_for(population[HQMF::PopulationCriteria::DENEXCEP], HQMF::PopulationCriteria::DENEXCEP)}
         // CV
         #{js_for(population[HQMF::PopulationCriteria::MSRPOPL], HQMF::PopulationCriteria::MSRPOPL)}
+        #{js_for(population[HQMF::PopulationCriteria::MSRPOPLEX], HQMF::PopulationCriteria::MSRPOPLEX)}
         #{js_for(population[HQMF::PopulationCriteria::OBSERV], HQMF::PopulationCriteria::OBSERV)}
         "
       end

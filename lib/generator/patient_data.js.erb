@@ -14,7 +14,7 @@
 <%- end -%>
   var eventCriteria = {"type": "<%= eventType %>"<%- -%>
 <%= ", \"statuses\": #{statuses}" if statuses %> <%- -%>
-<%= ", \"includeEventsWithoutStatus\": #{includeEventsWithoutStatus}" if includeEventsWithoutStatus %> <%- -%>
+<%= ", \"includeEventsWithoutStatus\": #{includeEventsWithoutStatus}" unless includeEventsWithoutStatus.nil? %> <%- -%>
 <%= ", \"negated\": #{criteria.negation}" if criteria.negation %> <%- -%>
 <%= ", \"negationValueSetId\": \"#{negationValueSetId}\"" if criteria.negation && negationValueSetId %> <%- -%>
 <%= ", \"valueSetId\": \"#{valueSetId}\"" if valueSetId %> <%- -%>

@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class EffectiveDateTest < Test::Unit::TestCase
+class EffectiveDateTest < Minitest::Test
   def setup
     # Open a path to all of our fixtures
     model = JSON.parse(File.open("test/fixtures/NQF59New.json").read)

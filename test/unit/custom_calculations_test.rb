@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 require 'hquery-patient-api'
 
-class CustomCalculationsTest < Test::Unit::TestCase
+class CustomCalculationsTest < Minitest::Test
   
   def setup
     @context = get_js_context(HQMF2JS::Generator::JS.library_functions)
@@ -78,7 +78,7 @@ class CustomCalculationsTest < Test::Unit::TestCase
 
 
   def test_inr_results
-    @context.eval("typeof(hqmf.CustomCalc.PercentTTREntries) === 'function'").must_equal true
+    assert_equal true, @context.eval("typeof(hqmf.CustomCalc.PercentTTREntries) === 'function'")
     assert @context.eval("Math.abs(list.calculateDaysInRange(inr1,inr2) - 3.714285714285717) < .001")
     assert @context.eval("Math.abs(list.calculateDaysInRange(inr2,inr3)) == 0 ")
     assert @context.eval("Math.abs(list.calculateDaysInRange(inr3,inr4))  == 0")
@@ -92,10 +92,6 @@ class CustomCalculationsTest < Test::Unit::TestCase
     assert @context.eval("Math.abs(list.calculateDaysInRange(inr11,inr12) - 9.692307692) < .001")
     assert @context.eval("Math.abs(list.calculateDaysInRange(inr12,inr13) - 14) < .001")
     
-  end
-  
-  def test_total_number_of_days
-    @context.eval("list.totalNumberOfDays()").must_equal 198
   end
 
   def test_calculate_ttr
