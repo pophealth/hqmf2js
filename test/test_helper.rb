@@ -1,6 +1,5 @@
 require_relative "./simplecov"
-require 'test/unit'
-require 'turn'
+require 'minitest/autorun'
 
 if RUBY_PLATFORM=='java'
   require 'rhino'

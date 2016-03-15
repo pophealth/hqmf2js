@@ -17,18 +17,27 @@ hqmfjs.<%= js_name(criteria) %> = function(patient, initialSpecificContext) {
     <%- end -%>
     <%- if criteria.value -%>
   events = filterEventsByValue(events, <%= js_for_bounds(criteria.value) %>);
-    <%- elsif is_result_criteria(criteria) -%>
-  // force a check of results for result types so that performed does not bleed into results
+    <%- elsif is_result_criteria(criteria) && !criteria.negation -%>
+  // force a check of results for non-negated result types so that performed does not bleed into results
   events = filterEventsByValue(events, new ANYNonNull());
     <%- end -%>
     <%- if criteria.field_values.present?
           criteria.field_values.keys.each do |field| -%>
-  events = <%= field_library_method(field) %>(events, "<%= field_method(field) %>", <%= js_for_bounds(criteria.field_values[field]) %>);
+  events = <%= field_library_method(field, criteria.field_values[field]) %>(events, "<%= field_method(field) %>", <%= js_for_bounds(criteria.field_values[field]) %>);
       <%- end -%>
+      <%- if criteria.subset_operators -%>
+  fields = <%= criteria.field_values.keys.map {|field| field_method(field)} %>;
+      <%- end -%>
+    <%- end -%>
+    <%- if ['transfer_from','transfer_to'].include?(criteria.definition) -%>
+  events = denormalizeEventsByTransfer(events, '<%=criteria.definition.camelize(:lower)%>');
+    <%- end -%>
+    <%- if :communications == criteria.type-%>
+  events = filterEventsByCommunicationDirection(events, '<%=criteria.definition%>');
     <%- end -%>
     <%- if criteria.temporal_references and criteria.temporal_references.length > 0 -%>
       <%- criteria.temporal_references.each do |temporal_reference| -%>
-  if (events.length > 0) events = <%= temporal_reference.type %>(events, hqmfjs.<%= temporal_reference.reference.id %>(patient)<%= ", #{js_for_bounds(temporal_reference.range)}" if temporal_reference.range %>);
+  if (events.length > 0 || !Logger.short_circuit) events = <%= temporal_reference.type %>(events, hqmfjs.<%= temporal_reference.reference.id %>(patient)<%= ", #{js_for_bounds(temporal_reference.range)}" if temporal_reference.range %>);
       <%- end -%>
   if (events.length == 0) events.specificContext=hqmf.SpecificsManager.empty();
     <%- else # no temporal refs -%>
@@ -40,7 +49,7 @@ hqmfjs.<%= js_name(criteria) %> = function(patient, initialSpecificContext) {
     <%- end -%>
     <%- if criteria.subset_operators -%>
       <%- criteria.subset_operators.select {|subset_operator| subset_operator.type}.each do |subset_operator| -%>
-  events = <%= subset_operator.type %>(events<%= ", #{js_for_bounds(subset_operator.value)}" if subset_operator.value %>, initialSpecificContext);
+  events = <%= subset_operator.type %>(events<%= if subset_operator.value then ", #{js_for_bounds(subset_operator.value)}"; elsif subset_operator.type == 'DATETIMEDIFF' then ", null"; end  %>, initialSpecificContext<%- if ['SUM','MEDIAN'].include?(subset_operator.type) -%>, fields<%- end -%>);
       <%- end # each operator -%>
     <%- end # subset operators -%>
   return events;

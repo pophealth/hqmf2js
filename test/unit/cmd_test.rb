@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 require 'hquery-patient-api'
 
-class CmdTest < Test::Unit::TestCase
+class CmdTest < Minitest::Test
   
   def setup
     @context = get_js_context(HQMF2JS::Generator::JS.library_functions)
@@ -91,5 +91,128 @@ class CmdTest < Test::Unit::TestCase
     assert_equal 0, @context.eval("no_meds.cumulativeMedicationDuration(range)"), "CMD should be 10"
   end
 
+
+def test_fullfillment_based_cmd
+    medication1 = %{
+      {
+        "dose" : {"unit" : "mg", "value" : "5"},
+        "administrationTiming" :{'period' : {'unit': 'h' , 'value': 8 }},
+        "fulfillmentHistory": [
+          {"dispenseDate": #{Time.utc(2010,01,01).to_i} , "quantityDispensed" : {"value" :"150", "unit" : "mg"}}
+         ]
+      }
+    }
+
+    medication2 = %{
+        {
+          "dose" : {"unit" : "mg", "value" : "1"},
+          "administrationTiming" :{'period' : {'unit': 'h' , 'value': 8 }},
+          "fulfillmentHistory": [
+            {"dispenseDate": #{Time.utc(2010,01,01).to_i} , "quantityDispensed" : {"value" :"30"}},
+            {"dispenseDate": #{Time.utc(2010,10,01).to_i} , "quantityDispensed" : {"value" :"90"}}
+           ]
+        }
+      }
+
+    no_history = %{
+        {
+          "dose" : {"unit" : "mg", "value" : "5"},
+          "administrationTiming" :{'period' : {'unit': 'h' , 'value': 8 }},
+          "fulfillmentHistory": []
+        }
+      }
+    @context.eval("var med = new hQuery.Medication(#{medication1})")
+    @context.eval("var med2 = new hQuery.Medication(#{medication2})")
+    @context.eval("var no_meds = new hQuery.Medication(#{no_history})")
+    @context.eval("var range = new IVL_TS(new TS('20100101'), new TS('20101231'))")
+    @context.eval("var cmd1 = new CMD([med],'fullfillment')")
+    @context.eval("var cmd2 = new CMD([med2],'fullfillment')")
+    @context.eval("var cmd3 = new CMD([no_meds],'fullfillment')")
+    assert_equal 10, @context.eval("cmd1.days_active(range.low,range.high).length"), "CMD should be 10"
+    assert_equal 40, @context.eval("cmd2.days_active(range.low,range.high).length"), "CMD should be 40"
+    assert_equal 0, @context.eval("cmd3.days_active(range.low,range.high).length"), "CMD should be 0"
+  end
+
+
+def test_order_based_cmd
+    medication1 = %{
+      {
+        "dose" : {"unit" : "mg", "value" : "5"},
+        "administrationTiming" :{'period' : {'unit': 'h' , 'value': 8 }},
+        "orderInformation": [
+          {"orderDateTime": #{Time.utc(2010,01,01).to_i} , "quantityOrdered" : {"value" :"150", "unit" : "mg"}, "fills": 2}
+         ]
+      }
+    }
+
+    medication2 = %{
+        {
+          "dose" : {"unit" : "mg", "value" : "1"},
+          "administrationTiming" :{'period' : {'unit': 'h' , 'value': 8 }},
+          "orderInformation": [
+            {"orderDateTime": #{Time.utc(2010,01,01).to_i} , "quantityOrdered" : {"value" :"30"}},
+            {"orderDateTime": #{Time.utc(2010,10,01).to_i} , "quantityOrdered" : {"value" :"90"}}
+           ]
+        }
+      }
+
+    no_history = %{
+        {
+          "dose" : {"unit" : "mg", "value" : "5"},
+          "administrationTiming" :{'period' : {'unit': 'h' , 'value': 8 }},
+          "orderInformation": []
+        }
+      }
+    @context.eval("var med = new hQuery.Medication(#{medication1})")
+    @context.eval("var med2 = new hQuery.Medication(#{medication2})")
+    @context.eval("var no_meds = new hQuery.Medication(#{no_history})")
+    @context.eval("var range = new IVL_TS(new TS('20100101'), new TS('20101231'))")
+    @context.eval("var cmd1 = new CMD([med],'order')")
+    @context.eval("var cmd2 = new CMD([med2],'order')")
+    @context.eval("var cmd3 = new CMD([no_meds],'order')")
+    assert_equal 20, @context.eval("cmd1.days_active(range.low,range.high).length"), "CMD should be 10"
+    assert_equal 40, @context.eval("cmd2.days_active(range.low,range.high).length"), "CMD should be 40"
+    assert_equal 0, @context.eval("cmd3.days_active(range.low,range.high).length"), "CMD should be 0"
+  end
+
+  def test_active_days
+
+    @context.eval("var active = new ActiveDays()")
+    @context.eval("var ivl = new IVL_TS(new TS('20101001'), new TS('20101031'))")
+    @context.eval("active.add_ivlts(ivl)")
+    assert_equal 31, @context.eval("active.days_active(ivl.low,ivl.high).length")
+
+    @context.eval(" ivl = new IVL_TS(new TS('20101001'), new TS('20101010'))")
+    assert_equal 10, @context.eval("active.days_active(ivl.low,ivl.high).length")
+
+    @context.eval(" ivl = new IVL_TS(new TS('20101001'), new TS('20101110'))")
+    assert_equal 31, @context.eval("active.days_active(ivl.low,ivl.high).length")
+
+    @context.eval(" ivl = new IVL_TS(new TS('20101031'), new TS('20101110'))")
+    assert_equal 1, @context.eval("active.days_active(ivl.low,ivl.high).length")
+    
+    @context.eval(" ivl = new IVL_TS(new TS('20101110'), new TS('20110110'))")
+    @context.eval("active.add_ivlts(ivl)")
+
+    @context.eval(" ivl = new IVL_TS(new TS('20101031'), new TS('20101113'))")
+    assert_equal 5, @context.eval("active.days_active(ivl.low,ivl.high).length")
+    
+
+    @context.eval(" ivl = new IVL_TS(new TS('20101102'), new TS('20101113'))")
+    assert_equal 4, @context.eval("active.days_active(ivl.low,ivl.high).length")
+
+
+    @context.eval(" ivl = new IVL_TS(new TS('20100101'), new TS('20110113'))")
+    assert_equal 93, @context.eval("active.days_active(ivl.low,ivl.high).length")
+
+    @context.eval("ivl = new IVL_TS(new TS('20101110'), new TS('20110110'))")
+    @context.eval("active.add_ivlts(ivl)")
+
+    @context.eval(" ivl = new IVL_TS(new TS('20100101'), new TS('20110113'))")
+    assert_equal 93, @context.eval("active.days_active(ivl.low,ivl.high).length")
+
+
+
+  end
 
 end

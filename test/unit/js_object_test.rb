@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 require 'hquery-patient-api'
 
-class JSObjectTest < Test::Unit::TestCase
+class JSObjectTest < Minitest::Test
 
   def setup
   end
@@ -17,7 +17,7 @@ class JSObjectTest < Test::Unit::TestCase
     criteria = HQMF::DataCriteria.from_json(nil, JSON.parse(File.read(File.join('test','fixtures','json','data_criteria','specific_occurrence.json'))))
     expected = "hqmfjs.initializeSpecifics = function(patient_api, hqmfjs) { hqmf.SpecificsManager.initialize(patient_api,hqmfjs,{\"id\":\"\",\"type\":\"ENCOUNTER_PERFORMED_INPATIENT_ENCOUNTER\",\"function\":\"OccurrenceAInpatientEncounter1\"}) }"
     result = js.js_initialize_specifics([criteria])
-    result.must_equal expected
+    assert_equal expected, result
   end
 
   def test_to_js_without_codes

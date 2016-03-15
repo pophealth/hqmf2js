@@ -20,6 +20,7 @@ module HQMF2JS
           var effective_date = <%= effective_date %>;
           var enable_logging = <%= enable_logging %>;
           var enable_rationale = <%= enable_rationale %>;
+          var short_circuit = <%= short_circuit %>;
 
         <% if (!test_id.nil? && test_id.class==Moped::BSON::ObjectId) %>
           var test_id = new ObjectId(\"<%= test_id %>\");
@@ -89,10 +90,19 @@ module HQMF2JS
           return executeIfAvailable(hqmfjs.#{HQMF::PopulationCriteria::DENEXCEP}, patient_api);
         }
         var msrpopl = function() {
-          return executeIfAvailable(hqmfjs.#{HQMF::PopulationCriteria::MSRPOPL}, patient_api);
+          #{msrpopl_function(custom_functions, population_index)}
+        }
+        var msrpoplex = function() {
+          return executeIfAvailable(hqmfjs.#{HQMF::PopulationCriteria::MSRPOPLEX}, patient_api);
         }
         var observ = function(specific_context) {
           #{observation_function(custom_functions, population_index)}
+        }
+        
+        var variables = function() {
+          if (Logger.enable_rationale) {
+            return executeIfAvailable(hqmfjs.VARIABLES, patient_api);
+          }
         }
         
         var executeIfAvailable = function(optionalFunction, patient_api) {
@@ -115,11 +125,14 @@ module HQMF2JS
           // turn on logging if it is enabled
           if (enable_logging || enable_rationale) {
             injectLogger(hqmfjs, enable_logging, enable_rationale, short_circuit);
-          } 
+          } else {
+            Logger.enable_rationale = false;
+            Logger.short_circuit = short_circuit;
+          }
         }
 
         try {
-          map(patient, population, denominator, numerator, exclusion, denexcep, msrpopl, observ, occurrenceId,#{continuous_variable},stratification);
+          map(patient, population, denominator, numerator, exclusion, denexcep, msrpopl, msrpoplex, observ, occurrenceId,#{continuous_variable},stratification, variables);
         } catch(err) {
           print(err.stack);
           throw err;
@@ -143,6 +156,14 @@ module HQMF2JS
 
         result
 
+      end
+
+      def self.msrpopl_function(custom_functions, population_index)
+        if (custom_functions && custom_functions[HQMF::PopulationCriteria::MSRPOPL])
+          "return #{custom_functions[HQMF::PopulationCriteria::MSRPOPL]}(patient_api, hqmfjs)"
+        else
+          "return executeIfAvailable(hqmfjs.#{HQMF::PopulationCriteria::MSRPOPL}, patient_api);"
+        end
       end
 
     end

@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 require 'hquery-patient-api'
 
-class LibraryFunctionTest < Test::Unit::TestCase
+class LibraryFunctionTest < Minitest::Test
   
   def setup
     @context = get_js_context(HQMF2JS::Generator::JS.library_functions)
@@ -10,57 +10,57 @@ class LibraryFunctionTest < Test::Unit::TestCase
 
 
   def test_library_function_parses
-    @context.eval('hQuery == undefined').must_equal false
-    @context.eval('typeof hQuery.Patient').must_equal "function"
-    @context.eval('typeof allTrue').must_equal "function"
-    @context.eval('typeof atLeastOneTrue').must_equal "function"
+    assert_equal false, @context.eval('hQuery == undefined')
+    assert_equal "function", @context.eval('typeof hQuery.Patient')
+    assert_equal "function", @context.eval('typeof allTrue')
+    assert_equal "function", @context.eval('typeof atLeastOneTrue')
   end
   
   def test_all_true
-    @context.eval('allTrue(1,null,null,new Boolean(false),new Boolean(false),new Boolean(false))().isTrue()').must_equal false
-    @context.eval('allTrue(1,null,null,new Boolean(false),new Boolean(true),new Boolean(false))().isTrue()').must_equal false
-    @context.eval('allTrue(1,null,null,new Boolean(true),new Boolean(true),new Boolean(true))().isTrue()').must_equal true
-    @context.eval('allTrue(1,null,null)().isTrue()').must_equal false
+    assert_equal false, @context.eval('allTrue(1,null,null,new Boolean(false),new Boolean(false),new Boolean(false))().isTrue()')
+    assert_equal false, @context.eval('allTrue(1,null,null,new Boolean(false),new Boolean(true),new Boolean(false))().isTrue()')
+    assert_equal true, @context.eval('allTrue(1,null,null,new Boolean(true),new Boolean(true),new Boolean(true))().isTrue()')
+    assert_equal false, @context.eval('allTrue(1,null,null)().isTrue()')
   end
   
   def test_at_least_one_true
-    @context.eval('atLeastOneTrue(1,null,null,new Boolean(true),new Boolean(false),new Boolean(false))().isTrue()').must_equal true
-    @context.eval('atLeastOneTrue(1,null,null,new Boolean(true),new Boolean(true),new Boolean(true))().isTrue()').must_equal true
-    @context.eval('atLeastOneTrue(1,null,null,new Boolean(false),new Boolean(false),new Boolean(false))().isTrue()').must_equal false
-    @context.eval('atLeastOneTrue(1,null,null)().isTrue()').must_equal false
+    assert_equal true, @context.eval('atLeastOneTrue(1,null,null,new Boolean(true),new Boolean(false),new Boolean(false))().isTrue()')
+    assert_equal true, @context.eval('atLeastOneTrue(1,null,null,new Boolean(true),new Boolean(true),new Boolean(true))().isTrue()')
+    assert_equal false, @context.eval('atLeastOneTrue(1,null,null,new Boolean(false),new Boolean(false),new Boolean(false))().isTrue()')
+    assert_equal false, @context.eval('atLeastOneTrue(1,null,null)().isTrue()')
   end
   
   def test_all_false
-    @context.eval('allFalse(1,null,null,new Boolean(false),new Boolean(false),new Boolean(false))().isTrue()').must_equal true
-    @context.eval('allFalse(1,null,null,new Boolean(false),new Boolean(true),new Boolean(false))().isTrue()').must_equal false
-    @context.eval('allFalse(1,null,null,new Boolean(true),new Boolean(true),new Boolean(true))().isTrue()').must_equal false
-    @context.eval('allFalse(1,null,null)().isTrue()').must_equal false
+    assert_equal true, @context.eval('allFalse(1,null,null,new Boolean(false),new Boolean(false),new Boolean(false))().isTrue()')
+    assert_equal false, @context.eval('allFalse(1,null,null,new Boolean(false),new Boolean(true),new Boolean(false))().isTrue()')
+    assert_equal false, @context.eval('allFalse(1,null,null,new Boolean(true),new Boolean(true),new Boolean(true))().isTrue()')
+    assert_equal false, @context.eval('allFalse(1,null,null)().isTrue()')
   end
   
   def test_at_least_one_false
-    @context.eval('atLeastOneFalse(1,null,null,new Boolean(true),new Boolean(false),new Boolean(false))().isTrue()').must_equal true
-    @context.eval('atLeastOneFalse(1,null,null,new Boolean(true),new Boolean(true),new Boolean(true))().isTrue()').must_equal false
-    @context.eval('atLeastOneFalse(1,null,null,new Boolean(false),new Boolean(false),new Boolean(false))().isTrue()').must_equal true
-    @context.eval('atLeastOneFalse(1,null,null)().isTrue()').must_equal false
+    assert_equal true, @context.eval('atLeastOneFalse(1,null,null,new Boolean(true),new Boolean(false),new Boolean(false))().isTrue()')
+    assert_equal false, @context.eval('atLeastOneFalse(1,null,null,new Boolean(true),new Boolean(true),new Boolean(true))().isTrue()')
+    assert_equal true, @context.eval('atLeastOneFalse(1,null,null,new Boolean(false),new Boolean(false),new Boolean(false))().isTrue()')
+    assert_equal false, @context.eval('atLeastOneFalse(1,null,null)().isTrue()')
   end
   
   def test_patient_extensions
-    @context.eval('typeof hQuery.Patient.prototype.procedureResults').must_equal "function"
-    @context.eval('typeof hQuery.Patient.prototype.laboratoryTests').must_equal "function"
-    @context.eval('typeof hQuery.Patient.prototype.allMedications').must_equal "function"
-    @context.eval('typeof hQuery.Patient.prototype.allProblems').must_equal "function"
-    @context.eval('typeof hQuery.Patient.prototype.allDevices').must_equal "function"
-    @context.eval('typeof hQuery.Patient.prototype.activeDiagnoses').must_equal "function"
-    @context.eval('typeof hQuery.Patient.prototype.inactiveDiagnoses').must_equal "function"
-    @context.eval('typeof hQuery.Patient.prototype.resolvedDiagnoses').must_equal "function"
-    @context.eval('typeof hQuery.Patient.prototype.getEvents').must_equal "function"
+    assert_equal "function", @context.eval('typeof hQuery.Patient.prototype.procedureResults')
+    assert_equal "function", @context.eval('typeof hQuery.Patient.prototype.laboratoryTests')
+    assert_equal "function", @context.eval('typeof hQuery.Patient.prototype.allMedications')
+    assert_equal "function", @context.eval('typeof hQuery.Patient.prototype.allProblems')
+    assert_equal "function", @context.eval('typeof hQuery.Patient.prototype.allDevices')
+    assert_equal "function", @context.eval('typeof hQuery.Patient.prototype.activeDiagnoses')
+    assert_equal "function", @context.eval('typeof hQuery.Patient.prototype.inactiveDiagnoses')
+    assert_equal "function", @context.eval('typeof hQuery.Patient.prototype.resolvedDiagnoses')
+    assert_equal "function", @context.eval('typeof hQuery.Patient.prototype.getEvents')
   end
 
   def test_code_list
-    @context.eval('(new CodeList({"foo": [10,11]})).match(10)').must_equal true
-    @context.eval('(new CodeList({"foo": [10,11]})).match({"code": 10})').must_equal true
-    @context.eval('(new CodeList({"foo": [10,11]})).match(12)').must_equal false
-    @context.eval('(new CodeList({"foo": [10,11]})).match({"code": 12})').must_equal false
+    assert_equal true, @context.eval('(new CodeList({"foo": [10,11]})).match(10)')
+    assert_equal true, @context.eval('(new CodeList({"foo": [10,11]})).match({"code": 10})')
+    assert_equal false, @context.eval('(new CodeList({"foo": [10,11]})).match(12)')
+    assert_equal false, @context.eval('(new CodeList({"foo": [10,11]})).match({"code": 12})')
   end
   
   def test_pq
@@ -86,6 +86,7 @@ class LibraryFunctionTest < Test::Unit::TestCase
     ts = 'new TS("20110101")'
     ts2 = 'new TS("20100101")'
     ts3 = 'new TS("20120101")'
+    ts4 = '(function(){var ts=new TS();ts.date=null;return ts;})()' # set up a null date
     assert_equal 2011, @context.eval("#{ts}.asDate().getUTCFullYear()")
     assert_equal 0, @context.eval("#{ts}.asDate().getUTCMonth()")
     assert_equal 1, @context.eval("#{ts}.asDate().getUTCDate()")
@@ -101,6 +102,9 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert !@context.eval("#{ts}.after(#{ts3})")
     assert @context.eval("#{ts}.beforeOrConcurrent(#{ts})")
     assert @context.eval("#{ts}.afterOrConcurrent(#{ts})")
+    assert @context.eval("#{ts4}.equals(#{ts4})")
+    assert !@context.eval("#{ts3}.equals(#{ts4})")
+    assert !@context.eval("#{ts4}.equals(#{ts3})")
     
     # The following tests are taken from the Joint Commission guidance on time difference
     # calculations
@@ -269,7 +273,39 @@ class LibraryFunctionTest < Test::Unit::TestCase
     ivl1 = 'new IVL_TS(new TS("20120310"), new TS("20120320"))'
     ivl2 = 'new IVL_TS(new TS("20120312"), new TS("20120320"))'
     assert @context.eval("#{ivl2}.DURING(#{ivl1})")
+    assert !@context.eval("#{ivl1}.equals(#{ivl2})")
     assert_equal 2010, @context.eval('getIVL(new Date(Date.UTC(2010,1,1))).low.asDate().getUTCFullYear()')
+  end
+
+  def test_ivl_ts_null
+    ts1 = 'new TS("20120310")'
+    ts2 = 'new TS("20120320")'
+    null_ts = '(function(){var ts=new TS();ts.date=null;return ts;})()'
+    ivl = "new IVL_TS(#{ts1}, #{ts2})"
+    ivl_null_low = "new IVL_TS(#{null_ts}, #{ts2})"
+    ivl_null_high = "new IVL_TS(#{ts1}, #{null_ts})"
+    ivl_null_both = "new IVL_TS(#{null_ts}, #{null_ts})"
+
+    assert @context.eval("#{ivl}.equals(#{ivl})")
+    assert @context.eval("#{ivl_null_low}.equals(#{ivl_null_low})")
+    assert @context.eval("#{ivl_null_high}.equals(#{ivl_null_high})")
+    assert @context.eval("#{ivl_null_both}.equals(#{ivl_null_both})")
+
+    assert !@context.eval("#{ivl}.equals(#{ivl_null_low})")
+    assert !@context.eval("#{ivl}.equals(#{ivl_null_high})")
+    assert !@context.eval("#{ivl}.equals(#{ivl_null_both})")
+
+    assert !@context.eval("#{ivl_null_low}.equals(#{ivl})")
+    assert !@context.eval("#{ivl_null_low}.equals(#{ivl_null_high})")
+    assert !@context.eval("#{ivl_null_low}.equals(#{ivl_null_both})")
+
+    assert !@context.eval("#{ivl_null_high}.equals(#{ivl})")
+    assert !@context.eval("#{ivl_null_high}.equals(#{ivl_null_low})")
+    assert !@context.eval("#{ivl_null_high}.equals(#{ivl_null_both})")
+
+    assert !@context.eval("#{ivl_null_both}.equals(#{ivl})")
+    assert !@context.eval("#{ivl_null_both}.equals(#{ivl_null_low})")
+    assert !@context.eval("#{ivl_null_both}.equals(#{ivl_null_high})")
   end
   
   def test_any_non_null
@@ -361,6 +397,12 @@ class LibraryFunctionTest < Test::Unit::TestCase
     @context.eval('var events1 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105"), new TS("20120105"));}}]')
     @context.eval('var events2 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120102"), new TS("20120105"));}}]')
     @context.eval('var events3 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105203030"), new TS("20120105203030"));}}]')
+    @context.eval('var nullEndEvent = new IVL_TS(new TS("20110101"), new TS("20120105"));')
+    @context.eval('nullEndEvent.high.date = null;')
+    @context.eval('var events4 = [{"asIVL_TS": function() {return nullEndEvent;}}]')
+    @context.eval('var events5 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20140101"), new TS("20140201"));}}]')
+    @context.eval('var events6 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20101101"), new TS("20110101"));}}]')
+    @context.eval('var events7 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20110101"), new TS("20110201"));}}]')
     @context.eval('var bound1 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105"), new TS("20120105"));}}]')
     @context.eval('var bound2 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120107"), new TS("20120107"));}}]')
     @context.eval('var bound3 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120103"), new TS("20120107"));}}]')
@@ -368,8 +410,11 @@ class LibraryFunctionTest < Test::Unit::TestCase
     @context.eval('var bound5 = {"asIVL_TS": function() {return new IVL_TS(new TS("20120106"), new TS("20120107"));}}')
     @context.eval('var nullStartBound = new IVL_TS(new TS("20120105"), new TS("20120105"));')
     @context.eval('nullStartBound.low.date = null;')
+    @context.eval('var nullEndBound = new IVL_TS(new TS("20140601"), new TS("20140601"));')
+    @context.eval('nullEndBound.high.date = null;')
     @context.eval('var bound6 = {"asIVL_TS": function() {return nullStartBound;}}')
     @context.eval('var bound7 = [{"asIVL_TS": function() {return new IVL_TS(new TS("20120105193030"), new TS("20120105193030"));}}]')
+    @context.eval('var bound8 = {"asIVL_TS": function() {return nullEndBound;}}')
     @context.eval('var range1 = new IVL_PQ(null, new PQ(1, "d"))')
     @context.eval('var range2 = new IVL_PQ(new PQ(1, "d"), null)')
     @context.eval('var range3 = new IVL_PQ(new PQ(0, "d"), null)')
@@ -430,6 +475,12 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal 0, @context.eval('OVERLAP(events2, XPRODUCT(bound6))').count
     assert_equal 1, @context.eval('OVERLAP(events2, XPRODUCT(bound1))').count
     assert_equal 0, @context.eval('OVERLAP(events2, XPRODUCT(bound2))').count
+    ## Overlap with null ending
+    assert_equal 1, @context.eval('OVERLAP(events4, bound8)').count
+    assert_equal 1, @context.eval('OVERLAP(events4, bound1)').count
+    assert_equal 0, @context.eval('OVERLAP(events5, bound8)').count
+    assert_equal 1, @context.eval('OVERLAP(events6, events4)').count
+    assert_equal 1, @context.eval('OVERLAP(events4, events7)').count
     
     # SCW
     assert_equal 1, @context.eval('SCW(events1, bound1)').count
@@ -570,9 +621,28 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert_equal true, @context.eval('DATEDIFF([diffEvent1,diffEvent2],range4).isTrue()')
     assert_equal true, @context.eval('DATEDIFF([diffEvent2,diffEvent1],range4).isTrue()')
     assert_equal true, @context.eval('DATEDIFF([diffEvent1,diffEvent1],range4).isTrue()')
-    
-    # false test
-    
+
+    assert_equal true, @context.eval('DATETIMEDIFF([diffEvent1,diffEvent2],range4).isTrue()')
+    assert_equal true, @context.eval('DATETIMEDIFF([diffEvent2,diffEvent1],range4).isTrue()')
+    assert_equal true, @context.eval('DATETIMEDIFF([diffEvent1,diffEvent1],range4).isTrue()')
+
+
+    @context.eval("
+      var ts1 = new TS('20100101100000');
+      var ts2 = new TS('20100101101000');
+      var ts3 = new TS('20100101103000');
+      
+      var ddEvents1 = [{'id': 1, 'asTS': function() {return ts1;}}];
+      var ddEvents2 = [{'id': 20, 'asTS': function() {return ts2;}}];
+      var ddEvents3 = [{'id': 30, 'asTS': function() {return ts3;}, 'timeStamp': function() {return ts3.date}}, {'id': 20, 'asTS': function() {return ts2;}, 'timeStamp': function() {return ts2.date}}];
+    ");
+
+    assert_equal 1, @context.eval('DATETIMEDIFF(XPRODUCT(ddEvents1,ddEvents2)).length')
+    assert_equal 10, @context.eval('DATETIMEDIFF(XPRODUCT(ddEvents1,ddEvents2))[0]')
+    assert_equal 1, @context.eval('DATETIMEDIFF(XPRODUCT(ddEvents1,ddEvents3)).length')
+    assert_equal 30, @context.eval('DATETIMEDIFF(XPRODUCT(ddEvents1,ddEvents3))[0]')
+    assert_equal 1, @context.eval('DATETIMEDIFF(XPRODUCT(ddEvents2,ddEvents3)).length')
+    assert_equal 20, @context.eval('DATETIMEDIFF(XPRODUCT(ddEvents2,ddEvents3))[0]')
     
   end
   
@@ -648,6 +718,27 @@ class LibraryFunctionTest < Test::Unit::TestCase
     assert !@context.eval("MAX(#{events2},#{lessThan20}).isTrue()")
     assert !@context.eval("MIN(#{events2},#{between15and25}).isTrue()")
     assert @context.eval("MAX(#{events2},#{between15and25}).isTrue()")
+  end
+
+  def test_qdm_functions
+    # SUM and MEDIAN
+    @context.eval('var medications = [{"cumulativeMedicationDuration": function() { return 30;}}, {"cumulativeMedicationDuration": function() {return 40;}}, {"cumulativeMedicationDuration": function() {return 50;}}];')
+    v10 = '{"values": function() {return {"scalar": 10};}}'
+    v20 = '{"values": function() {return {"scalar": 20};}}'
+    events2 = "[#{v10},#{v20}]"
+    moreThan80 = 'new IVL_PQ(new PQ(81,"d"))'
+    exactly15 = 'new IVL_PQ(new PQ(15), new PQ(15))'
+    exactly30 = 'new IVL_PQ(new PQ(30), new PQ(30))'
+    exactly40 = 'new IVL_PQ(new PQ(40,"d"), new PQ(40,"d"))'
+    field_method = ['cumulativeMedicationDuration']
+    assert_equal true, @context.eval("SUM(medications,#{moreThan80},null,#{field_method}).isTrue()")
+    assert_equal true, @context.eval("MEDIAN(medications,#{exactly40},null,#{field_method}).isTrue()")
+    assert_equal false, @context.eval("SUM(medications,#{moreThan80},null,null).isTrue()")
+    assert_equal false, @context.eval("MEDIAN(medications,#{exactly40},null,null).isTrue()")
+    assert_equal true, @context.eval("MEDIAN(#{events2},#{exactly15},null,['result']).isTrue()")
+    assert_equal false, @context.eval("MEDIAN(#{events2},#{moreThan80},null,['result']).isTrue()")
+    assert_equal true, @context.eval("SUM(#{events2},#{exactly30},null,['result']).isTrue()")
+    assert_equal false, @context.eval("SUM(#{events2},#{exactly40},null,['result']).isTrue()")
   end
   
   def test_respond_to

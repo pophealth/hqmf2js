@@ -43,41 +43,33 @@ class hqmf.SpecificsManagerSingleton
     new hqmf.SpecificOccurrence([new Row(undefined)])
 
   setIfNull: (events) ->
-    if (!events.specificContext? || events.length == 0)
-      events.specificContext=hqmf.SpecificsManager.identity()
+    # Add specifics if missing, appropriately based on the truthiness
+    if !events.specificContext?
+      if events.isTrue()
+        events.specificContext=hqmf.SpecificsManager.identity()
+      else
+        events.specificContext=hqmf.SpecificsManager.empty()
     events
       
   getColumnIndex: (occurrenceID) ->
     columnIndex = @indexLookup[occurrenceID]
     if typeof columnIndex == "undefined"
-      throw "Unknown occurrence identifier: "+occurrenceID
+      throw new Error("Unknown occurrence identifier: "+occurrenceID)
     columnIndex
 
   empty: ->
     new hqmf.SpecificOccurrence([])
 
+  # Extract events for leftmost of supplied rows, returning copies with a specificRow attribute set
   extractEventsForLeftMost: (rows) ->
     events = []
     for row in rows
-      events.push(@extractEvent(row.leftMost, row)) if row.leftMost? || row.tempValue?
+      for event in row.leftMostEvents()
+        event = new event.constructor(event.json)
+        event.specificRow = row
+        events.push(event)
     events
-  
-  extractEvents: (key, rows) ->
-    events = []
-    for row in rows
-      events.push(@extractEvent(key, row))
-    events
-    
-  extractEvent: (key, row) ->
-    index = @indexLookup[key]
-    if index?
-      entry = row.values[index]
-    else
-      entry = row.tempValue
-    entry = new hQuery.CodedEntry(entry.json)
-    entry.specificRow = row
-    entry
-    
+
   intersectSpecifics: (nextPopulation, previousPopulation, occurrenceIDs) ->
     # we need to pass the episode indicies all the way down through the interesection to the match function
     # this must be done because we need to ensure that on intersection of populations the * does not allow an episode through
@@ -120,13 +112,13 @@ class hqmf.SpecificsManagerSingleton
   validate: (intersectedPopulation) ->
     intersectedPopulation.isTrue() and intersectedPopulation.specificContext.hasRows()
   
-  intersectAll: (boolVal, values, negate=false, episodeIndices) ->
+  intersectAll: (boolVal, values, negate=false, episodeIndices, options = {}) ->
     result = new hqmf.SpecificOccurrence
     # add identity row
     result.addIdentityRow()
     for value in values
       if value.specificContext?
-        result = result.intersect(value.specificContext, episodeIndices)
+        result = result.intersect(value.specificContext, episodeIndices, options)
     if negate and (!result.hasRows() or result.hasSpecifics())
       result = result.negate()
       result = result.compactReusedEvents()
@@ -154,10 +146,33 @@ class hqmf.SpecificsManagerSingleton
       boolVal = new Boolean(true) if @occurrences.length > 0
     boolVal.specificContext = result
     boolVal
-  
+
+  # Given a set of events with a specificContext, filter the events to include only those
+  # referenced in the specific context
+  filterEventsAgainstSpecifics: (events) ->
+    # If there are no specifics (ie identity) we return them all as-is
+    return events unless events.specificContext.hasSpecifics()
+
+    # Find all the events referenced in the specific context
+    referencedEvents = hqmf.SpecificsManager.extractEventsForLeftMost(events.specificContext.rows)
+    referencedEventIds = _(referencedEvents).pluck('id')
+
+    # Filter original events to only return referenced ones (and ones without an ID, likely dates)
+    result = _(events).select (e) -> !e.id || _(referencedEventIds).contains(e.id)
+
+    # Copy the specifics over and return the result
+    hqmf.SpecificsManager.maintainSpecifics(result, events)
+    return result
+
   # copy the specifics parameters from an existing element onto the new value element
   maintainSpecifics: (newElement, existingElement) ->
-    newElement.specificContext = existingElement.specificContext
+    # We handle a special case: if the existing element is falsy (ie an empty result set), and the new element
+    # is truthy (ie a boolean true), and the specific context is the empty set (no rows), we change it to the
+    # identity; this can happen, for example, if the new element is checking COUNT=0 of the existing element
+    if newElement.isTrue() && existingElement.isFalse() && existingElement.specificContext? && !existingElement.specificContext.hasRows()
+      newElement.specificContext = hqmf.SpecificsManager.identity()
+    else
+      newElement.specificContext = existingElement.specificContext
     newElement.specific_occurrence = existingElement.specific_occurrence
     newElement
 
@@ -195,11 +210,10 @@ class hqmf.SpecificOccurrence
     result
   
   removeDuplicateRows: () ->
-    deduped = new hqmf.SpecificOccurrence
-    for row in @rows
-      # this could potentially be hasRow to dump even more rows.
-      deduped.addRows([row]) if !deduped.hasExactRow(row)
-    deduped
+    # Uniq rows based on each row's string transformation
+    uniqRows = {}
+    uniqRows[row.toHashKey()] = row for row in @rows
+    new hqmf.SpecificOccurrence(_(uniqRows).values())
     
   # Returns a count of unique events for a supplied column index
   uniqueEvents: (columnIndices) ->
@@ -230,21 +244,21 @@ class hqmf.SpecificOccurrence
     value.rows = @rows.concat(other.rows)
     value.removeDuplicateRows()
   
-  intersect: (other, episodeIndices) ->
+  intersect: (other, episodeIndices, options = {}) ->
     value = new hqmf.SpecificOccurrence()
     for leftRow in @rows
       for rightRow in other.rows
-        result = leftRow.intersect(rightRow, episodeIndices)
+        result = leftRow.intersect(rightRow, episodeIndices, options)
         value.rows.push(result) if result?
     value.removeDuplicateRows()
   
   getLeftMost: ->
-    leftMost = undefined
+    specificLeftMost = undefined
     for row in @rows
-      leftMost = row.leftMost unless leftMost?
-      return undefined if leftMost != row.leftMost
-    leftMost
-  
+      specificLeftMost = row.specificLeftMost unless specificLeftMost?
+      return undefined if specificLeftMost != row.specificLeftMost
+    specificLeftMost
+
   negate: ->
     negatedRows = []
     keys = []
@@ -274,6 +288,22 @@ class hqmf.SpecificOccurrence
       newRows.push(myRow) if goodRow
     new hqmf.SpecificOccurrence(newRows)
   
+  # Given a set of events, return new specifics removing any rows that *do not* refer to that set of events
+  filterSpecificsAgainstEvents: (events) ->
+    # If there are no specifics (ie identity) return what we have as-is
+    return this unless @hasSpecifics()
+
+    # Keep and return the rows that refer to any of the provided events (via a leftMost)
+    rowsToKeep = _(@rows).select (row) ->
+      _(row.leftMostEvents()).any (leftMostEvent) ->
+        _(events).any (event) ->
+          # We consider events the same if either 1) both have ids and the ids are the same, or 2) both are
+          # dates, and the dates are the same
+          (event instanceof Date && leftMostEvent instanceof Date && event.getTime() == leftMostEvent.getTime()) ||
+          (event.id? && leftMostEvent.id? && event.id == leftMostEvent.id)
+
+    new hqmf.SpecificOccurrence(rowsToKeep)
+
   hasRow: (row) ->
     found = false
     for myRow in @rows
@@ -298,10 +328,14 @@ class hqmf.SpecificOccurrence
   
   finalizeEvents: (eventsContext, boundsContext) ->
     result = this
-    result = result.intersect(eventsContext) if (eventsContext?)
-    result = result.intersect(boundsContext) if (boundsContext?)
+    result = result.intersect(eventsContext) if eventsContext?
+    result = result.intersect(boundsContext) if boundsContext?
     result.compactReusedEvents()
   
+  # Group rows by everything except the leftmost to apply the subset only to the events from the specific
+  # occurrence context rows on the leftmost column. eg for "MOST RECENT: Occurrence A of Lab Result during
+  # Occurrence A of Encounter" we want to group by the encounter and apply the most recent to the set of
+  # lab results per group (ie encounter)
   group: ->
     groupedRows = {}
     for row in @rows
@@ -309,21 +343,27 @@ class hqmf.SpecificOccurrence
       groupedRows[row.groupKeyForLeftMost()].push(row)
     groupedRows
     
-  COUNT: (range) ->
-    @applyRangeSubset(COUNT, range)
+  COUNT: (range, fields) ->
+    @applyRangeSubset(COUNT, range, fields)
 
-  MIN: (range) ->
-    @applyRangeSubset(MIN, range)
+  MIN: (range, fields) ->
+    @applyRangeSubset(MIN, range, fields)
 
-  MAX: (range) ->
-    @applyRangeSubset(MAX, range)
+  MAX: (range, fields) ->
+    @applyRangeSubset(MAX, range, fields)
+
+  SUM: (range, fields) ->
+    @applyRangeSubset(SUM, range, fields)
+
+  MEDIAN: (range, fields) ->
+    @applyRangeSubset(MEDIAN, range, fields)
     
-  applyRangeSubset: (func, range) ->
+  applyRangeSubset: (func, range, fields) ->
     return this if !@hasSpecifics()
     resultRows = []
     groupedRows = @group()
     for groupKey, group of groupedRows
-      if func(hqmf.SpecificsManager.extractEventsForLeftMost(group), range).isTrue()
+      if func(hqmf.SpecificsManager.extractEventsForLeftMost(group), range, null, fields).isTrue()
         resultRows = resultRows.concat(group)
     new hqmf.SpecificOccurrence(resultRows)
 
@@ -350,7 +390,7 @@ class hqmf.SpecificOccurrence
 
   hasLeftMost: ->
     for row in @rows
-      if row.leftMost? || row.tempValue?
+      if row.specificLeftMost? || row.nonSpecificLeftMost?
         return true
     return false
     
@@ -374,11 +414,11 @@ class hqmf.SpecificOccurrence
 
 class Row
   # {'OccurrenceAEncounter':1, 'OccurrenceBEncounter'2}
-  constructor: (leftMost, occurrences={}) ->
+  constructor: (specificLeftMost, occurrences={}) ->
     @length = hqmf.SpecificsManager.occurrences.length
     @values = []
-    @leftMost = leftMost
-    @tempValue = occurrences[undefined]
+    @specificLeftMost = specificLeftMost
+    @nonSpecificLeftMost = occurrences[undefined]
     for i in [0...@length]
       key = hqmf.SpecificsManager.keyLookup[i]
       value = occurrences[key] || hqmf.SpecificsManager.any
@@ -401,14 +441,25 @@ class Row
   equals: (other) ->
     equal = true;
     
-    equal &&= Row.valuesEqual(@tempValue, other.tempValue)
+    equal &&= Row.valuesEqual(@nonSpecificLeftMost, other.nonSpecificLeftMost)
     for value,i in @values
       equal &&= Row.valuesEqual(value, other.values[i])
     equal
 
-  intersect: (other, episodeIndices) ->
-    intersectedRow = new Row(@leftMost, {})
-    intersectedRow.tempValue = @tempValue
+  intersect: (other, episodeIndices, options = {}) ->
+
+    # When we're calculating an actual intersection, where we're returning a set of events, we want to make sure that rows that reference
+    # disjoint expressions aren't combined; this isn't true if we're calculating a boolean AND, chaining temporal operators, etc
+    if options.considerLeftMost
+      # If rows being intersected have different leftMost values, with neither null, then the rows reference disjoint expressions and can't be intersected
+      return undefined if @specificLeftMost && other.specificLeftMost && !Row.valuesEqual(@specificLeftMost, other.specificLeftMost)
+      return undefined if @nonSpecificLeftMost && other.nonSpecificLeftMost && !Row.valuesEqual(@nonSpecificLeftMost, other.nonSpecificLeftMost)
+      # We can set the result row to leftMost + tempValue of whichever of row has it set, since they'll either be the same or one will be undefined
+      intersectedRow = new Row(@specificLeftMost || other.specificLeftMost, {})
+      intersectedRow.nonSpecificLeftMost = @nonSpecificLeftMost || other.nonSpecificLeftMost
+    else
+      intersectedRow = new Row(@specificLeftMost, {})
+      intersectedRow.nonSpecificLeftMost = @nonSpecificLeftMost
 
     # if all the episodes are any, then they were not referenced by the parent population.  This occurs when an intersection is done 
     # against the identity row.  In this case we want to allow the specific occurrences through.  This happens when we intersect against a measure
@@ -431,16 +482,20 @@ class Row
     return true
 
   groupKeyForLeftMost: ->
-    @groupKey(@leftMost)
-    
-  groupKey: (key=null) ->
+    # Get the key(s) to group by, handling hash of specifics or single specific
+    if _.isObject(@specificLeftMost)
+      @groupKey(_(@specificLeftMost).chain().values().flatten().value())
+    else
+      @groupKey([@specificLeftMost])
+
+  groupKey: (keys) ->
+    keys = [keys] if _.isString(keys)
     keyForGroup = ''
     for i in [0...@length]
-      value = hqmf.SpecificsManager.any
-      value = @values[i].id if @values[i] != hqmf.SpecificsManager.any 
-      if hqmf.SpecificsManager.keyLookup[i] == key
+      if _(keys).include(hqmf.SpecificsManager.keyLookup[i])
         keyForGroup += "X_"
       else
+        value = if @values[i] != hqmf.SpecificsManager.any then @values[i].id else hqmf.SpecificsManager.any
         keyForGroup += "#{value}_"
     keyForGroup
     
@@ -481,8 +536,16 @@ class Row
         for matchKey in matchKeys
           occurrences = {}
           occurrences[entryKey] = entry
-          occurrences[matchKey] = match
+          occurrences[matchKey] = match if matchKey? # We don't want to track RHS unless it's a specific occurrence
           rows.push(new Row(entryKey, occurrences))
+      else
+        # Handle case where the match is not a specific occurrence (may have specific occurrences on the RHS)
+        nonSpecificLeftMostRows = _(matches.specificContext.rows).select (r) -> r.nonSpecificLeftMost?.id == match.id
+        entryOccurrences = {}
+        entryOccurrences[entryKey] = entry
+        for nonSpecificLeftMostRow in nonSpecificLeftMostRows
+          result = nonSpecificLeftMostRow.intersect(new Row(entryKey, entryOccurrences))
+          rows.push(result) if result?
     rows
     
   # build specific for a given entry (there are no temporal references)
@@ -503,7 +566,26 @@ class Row
         result.push(value.id)
     result
 
-  
+  toHashKey: ->
+    @flattenToIds().join(",") + ",#{@specificLeftMost}" + ",#{@nonSpecificLeftMost?.id}"
+
+  # If the row references a leftmost, either specific or not, return the event(s)
+  # (because a UNION can place multiple events in the specific leftMost, this can be > 1)
+  leftMostEvents: ->
+    if @nonSpecificLeftMost?
+      return [@nonSpecificLeftMost]
+    if @specificLeftMost? && _.isString(@specificLeftMost)
+      specificIndex = hqmf.SpecificsManager.getColumnIndex(@specificLeftMost)
+      return [@values[specificIndex]] if @values[specificIndex]? && @values[specificIndex] != hqmf.SpecificsManager.any
+    if @specificLeftMost? && _.isObject(@specificLeftMost)
+      events = []
+      for id, occurrences of @specificLeftMost
+        for occurrence in _.uniq(occurrences)
+          specificIndex = hqmf.SpecificsManager.getColumnIndex(occurrence)
+          events.push(@values[specificIndex]) if @values[specificIndex]? && @values[specificIndex] != hqmf.SpecificsManager.any
+      return events
+    return []
+
 @Row = Row
   
 ###

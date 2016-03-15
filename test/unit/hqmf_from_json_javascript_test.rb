@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class HqmfFromJsonJavascriptTest < Test::Unit::TestCase
+class HqmfFromJsonJavascriptTest < Minitest::Test
   def setup
     json_measure = File.open("test/fixtures/json/59New.json").read
     measure_hash = JSON.parse(json_measure)
@@ -60,6 +60,7 @@ class HqmfFromJsonJavascriptTest < Test::Unit::TestCase
     assert !@context.eval("hqmfjs.dead3MonthsAfterMeasurePeriod(numeratorPatient).isTrue()")
     assert !@context.eval("hqmfjs.deadBetween5and6MonthsDuringMeasurePeriod(numeratorPatient).isTrue()")
     
+    @context.eval("numeratorPatient.json['expired']=true")
     @context.eval("numeratorPatient.json['deathdate']=#{Time.utc(2010,11).to_i}")
     assert !@context.eval("hqmfjs.dead3MonthsBeforeMeasurePeriod(numeratorPatient).isTrue()")
     assert !@context.eval("hqmfjs.dead3MonthsAfterMeasurePeriod(numeratorPatient).isTrue()")

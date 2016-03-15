@@ -1,14 +1,28 @@
 @hqmf.CustomCalc = {}
+@ADE_PRE_V4_ID = ['40280381-454E-C5FA-0145-517F7383016D']
 
 @hqmf.CustomCalc.ADE_TTR_OBSERV = (patient, hqmfjs) ->
-  inrReadings = DURING(hqmfjs.LaboratoryTestResultInr(patient), hqmfjs.MeasurePeriod(patient));
+  if (ADE_PRE_V4_ID.indexOf(hqmfjs.hqmf_id)!=-1)
+    inrReadings = DURING(hqmfjs.LaboratoryTestResultInr(patient), hqmfjs.MeasurePeriod(patient));
+  else
+    inrReadings = DURING(hqmfjs.LaboratoryTestPerformedInr(patient), hqmfjs.MeasurePeriod(patient));
   inrReadings = new hqmf.CustomCalc.PercentTTREntries(inrReadings)
-  [inrReadings.calculatePercentTTR()]
+  return [inrReadings.calculatePercentTTR()]
+
+@hqmf.CustomCalc.ADE_TTR_MSRPOPL = (patient, hqmfjs) ->
+  if (ADE_PRE_V4_ID.indexOf(hqmfjs.hqmf_id)!=-1)
+    inrReadings = DURING(hqmfjs.LaboratoryTestResultInr(patient), hqmfjs.MeasurePeriod(patient));
+  else
+    inrReadings = DURING(hqmfjs.LaboratoryTestPerformedInr(patient), hqmfjs.MeasurePeriod(patient));
+  inrReadings = new hqmf.CustomCalc.PercentTTREntries(inrReadings)
+  return new Boolean(inrReadings.calculateNumberOfIntervals() > 1)
 
 class @hqmf.CustomCalc.PercentTTREntries extends hQuery.CodedEntryList
 
   constructor: (events) ->
     super()
+    @inrRanges = 0
+    @totalNumberOfDays = 0
     @minInr = 2.0
     @maxInr = 3.0
     @minOutOfRange = 0.8
@@ -71,17 +85,21 @@ class @hqmf.CustomCalc.PercentTTREntries extends hQuery.CodedEntryList
 
 
   calculateDaysInRange: (firstInr, secondInr) ->
-
-    if ((@belowRange(firstInr) and @belowRange(secondInr)) or (@aboveRange(firstInr) and @aboveRange(secondInr)))
-      0
-    else if (@inRange(firstInr) and @inRange(secondInr))
-      @differenceInDays(firstInr,secondInr)
-    else if (@outsideRange(firstInr) and @inRange(secondInr))
-      @calculateCrossingRange(firstInr,secondInr)
-    else if (@inRange(firstInr) and @outsideRange(secondInr))
-      @calculateCrossingRange(secondInr, firstInr)
+    if(@differenceInDays(firstInr, secondInr) < 57)
+      @inrRanges = @inrRanges + 1
+      @totalNumberOfDays = @totalNumberOfDays + @differenceInDays(firstInr, secondInr)
+      if ((@belowRange(firstInr) and @belowRange(secondInr)) or (@aboveRange(firstInr) and @aboveRange(secondInr)))
+        0
+      else if (@inRange(firstInr) and @inRange(secondInr))
+        @differenceInDays(firstInr,secondInr)
+      else if (@outsideRange(firstInr) and @inRange(secondInr))
+        @calculateCrossingRange(firstInr,secondInr)
+      else if (@inRange(firstInr) and @outsideRange(secondInr))
+        @calculateCrossingRange(secondInr, firstInr)
+      else 
+        @calculateSpanningRange(firstInr, secondInr)
     else 
-      @calculateSpanningRange(firstInr, secondInr)
+      0
 
   calculateCrossingRange: (outside,inside) ->
     outsideInr = @inrValue(outside)
@@ -114,9 +132,6 @@ class @hqmf.CustomCalc.PercentTTREntries extends hQuery.CodedEntryList
   inrValue: (entry) ->
     entry.values()[0].scalar()
     
-  totalNumberOfDays: () ->
-    @differenceInDays(this[0],this[this.length-1])
-    
   calculateTTR: () ->
     total = 0
     for left, i in this
@@ -125,6 +140,18 @@ class @hqmf.CustomCalc.PercentTTREntries extends hQuery.CodedEntryList
         total += @calculateDaysInRange(left, right)
     total
 
+  calculateNumberOfIntervals: () ->
+    total = 0
+    for left, i in this
+      if (i < this.length-1)
+        right = this[i+1]
+        if(@differenceInDays(left, right) < 57)
+          total = total + 1
+    total
+
   calculatePercentTTR: () ->
-    @calculateTTR()/@totalNumberOfDays()*100
-    
+    @totalNumberOfDays = 0
+    if (@calculateNumberOfIntervals() > 1)
+      @calculateTTR()/@totalNumberOfDays*100
+    else 
+      return

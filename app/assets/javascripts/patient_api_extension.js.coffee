@@ -54,6 +54,17 @@ hQuery.Encounter::lengthOfStay = (unit) ->
   ivl_ts = this.asIVL_TS()
   ivl_ts.low.difference(ivl_ts.high, unit)
 
+hQuery.Encounter::transferTime = () ->
+  transfer = (@json['transferFrom'] || @json['transferTo'])
+  time = transfer.time if transfer
+  if time
+    hQuery.dateFromUtcSeconds(time)
+  else
+    if @json['transferTo']
+      @endDate()
+    else
+      @startDate()
+
 hQuery.AdministrationTiming::dosesPerDay = () ->
   #figure out the units and value and calculate
   p = this.period()
@@ -94,19 +105,31 @@ hQuery.Fulfillment::daysInRange = (dateRange,dose, dosesPerDay) ->
 # date range
 hQuery.Medication::fulfillmentTotals = (dateRange)->
   dpd = this.administrationTiming().dosesPerDay()
-  dose = this.dose().value()
+  dose = this.dose().scalar
   this.fulfillmentHistory().reduce (t, s) -> 
     t + s.daysInRange(dateRange,dose,dpd)
   , 0  
   
 hQuery.Medication::cumulativeMedicationDuration = (dateRange) ->
-  #assuming that the dose is the same across fills and that fills is  stated in individual 
-  #doses not total amount. Will need to flush this out more at a later point in time. 
-  #Considering that liquid meds are probaly dispensed as total volume ex 325ml with a dose of 
-  #say 25ml per dose.  Will definatley need to revisit this.  
-  this.fulfillmentTotals(dateRange) if this.administrationTiming() && this.dose()
+  #assuming that the dose is the same across fills and that fills is  stated in individual
+  #doses not total amount. Will need to flush this out more at a later point in time.
+  #Considering that liquid meds are probaly dispensed as total volume ex 325ml with a dose of
+  #say 25ml per dose.  Will definatley need to revisit this.
+  this.fulfillmentTotals(dateRange) if this.administrationTiming() && this.dose() && @json['fulfillmentHistory']
+
+class hQuery.Reference 
+  constructor: (@json) ->
+  referenced_id: -> @json["referenced_id"]
+  referenced_type: -> @json["reference"]
+  type: ->   @json["type"]
 
 
+hQuery.CodedEntry::references = () ->
+  for ref in (@json["references"] || [])
+    new hQuery.Reference(ref)
+
+hQuery.CodedEntry::referencesByType = (type) -> 
+  e for e in @references() when e.type() == type
 
 hQuery.CodedEntry::respondTo = (functionName) ->
   typeof(@[functionName]) == "function"

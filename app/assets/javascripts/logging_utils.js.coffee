@@ -9,7 +9,9 @@ class @Logger
     if @enable_rationale and result? and typeof(result.isTrue) == 'function'
       if result.isTrue() and result.length
         json_results = _.map(result,(item) -> {id: item.id, json: item.json})
-        @rationale[id] = {results: json_results }
+        if result.specificContext?
+          specific_ids = result.specificContext.flattenToIds()
+        @rationale[id] = {results: json_results, specifics: specific_ids }
       else  
         @rationale[id] = result.isTrue()
 
@@ -132,9 +134,9 @@ class @Logger
     );
     
     # Wrap selected HQMF Util functions
-    hqmf.SpecificsManagerSingleton.prototype.intersectAll = _.wrap(hqmf.SpecificsManagerSingleton.prototype.intersectAll, (func, boolVal, values, negate=false, episodeIndices) ->
-      func = _.bind(func, this, boolVal, values, negate, episodeIndices)
-      result = func(boolVal, values, negate, episodeIndices)
+    hqmf.SpecificsManagerSingleton.prototype.intersectAll = _.wrap(hqmf.SpecificsManagerSingleton.prototype.intersectAll, (func, boolVal, values, negate=false, episodeIndices, options) ->
+      func = _.bind(func, this, boolVal, values, negate, episodeIndices, options)
+      result = func(boolVal, values, negate, episodeIndices, options)
       Logger.info("Intersecting (#{values.length}):")
       for value in values
         Logger.logSpecificContext(value)

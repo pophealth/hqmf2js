@@ -47,6 +47,8 @@ namespace :hqmf do
       f.write(gen.js_for(HQMF::PopulationCriteria::MSRPOPL))
       f.write("\n// OBSERV\n")
       f.write(gen.js_for(HQMF::PopulationCriteria::OBSERV))
+      f.write("\n// MSRPOPLEX\n")
+      f.write(gen.js_for(HQMF::PopulationCriteria::MSRPOPLEX))
     end
     
     puts "wrote javascript to: #{out_file}"

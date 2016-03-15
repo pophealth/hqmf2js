@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 require 'hquery-patient-api'
 
-class HqmfJavascriptTest < Test::Unit::TestCase
+class HqmfJavascriptTest < Minitest::Test
   def setup
     # Open a path to all of our fixtures
     model = JSON.parse(File.open("test/fixtures/NQF59New.json").read)
@@ -48,11 +48,11 @@ class HqmfJavascriptTest < Test::Unit::TestCase
     local_context.eval("#{hqmf_utils}
                         #{value}")
                         
-    local_context.eval('typeof hqmfjs != undefined').must_equal true
-    local_context.eval('typeof OidDictionary != undefined').must_equal true
-    local_context.eval('typeof hqmfjs.IPP != undefined').must_equal true
-    local_context.eval('typeof hqmfjs.NUMER != undefined').must_equal true
-    local_context.eval('typeof hqmfjs.DENOM != undefined').must_equal true
+    assert_equal true, local_context.eval('typeof hqmfjs != undefined')
+    assert_equal true, local_context.eval('typeof OidDictionary != undefined')
+    assert_equal true, local_context.eval('typeof hqmfjs.IPP != undefined')
+    assert_equal true, local_context.eval('typeof hqmfjs.NUMER != undefined')
+    assert_equal true, local_context.eval('typeof hqmfjs.DENOM != undefined')
   end
 
   def test_to_js_method_without_codes
@@ -205,7 +205,7 @@ class HqmfJavascriptTest < Test::Unit::TestCase
     context = HQMF2JS::Generator::ErbContext.new({})
     criteria = HQMF::DataCriteria.new(nil,nil,nil,nil,nil,nil,nil,'patient_characteristic',nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil)
     
-    exception = assert_raise RuntimeError do
+    exception = assert_raises RuntimeError do
       n = context.js_name(criteria)
     end
     assert exception.message.match(/^No identifier for .*/)
